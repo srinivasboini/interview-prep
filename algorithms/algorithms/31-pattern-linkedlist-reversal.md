@@ -1,57 +1,114 @@
-# Pattern: LinkedList Reversal
+# Pattern: Linked List Reversal - Complete Guide
 
 ## Overview
-In-place reversal of linked lists.
+Reverse linked list in-place using iterative or recursive approach.
 
-## Interview Problems
+**Time**: O(n), **Space**: O(1) iterative, O(n) recursive
 
-### Problem: Reverse Nodes in k-Group (Hard)
-**Pattern**: In-place Reversal
+---
 
+## Template
 ```java
-/**
- * Reverse nodes in k-group.
- * Time: O(n)
- * Space: O(1)
- */
-public ListNode reverseKGroup(ListNode head, int k) {
-    if (head == null || k == 1) return head;
-    
-    ListNode dummy = new ListNode(0);
-    dummy.next = head;
-    ListNode curr = head, prev = dummy;
-    int count = 0;
+public ListNode reverse(ListNode head) {
+    ListNode prev = null, curr = head;
     
     while (curr != null) {
-        count++;
-        if (count % k == 0) {
-            prev = reverse(prev, curr.next);
-            curr = prev.next;
-        } else {
-            curr = curr.next;
-        }
-    }
-    return dummy.next;
-}
-
-private ListNode reverse(ListNode begin, ListNode end) {
-    ListNode prev = begin;
-    ListNode curr = begin.next;
-    ListNode first = curr;
-    ListNode next;
-    
-    while (curr != end) {
-        next = curr.next;
+        ListNode next = curr.next;
         curr.next = prev;
         prev = curr;
         curr = next;
     }
     
-    begin.next = prev;
-    first.next = curr;
-    return first;
+    return prev;
 }
 ```
 
 ---
+
+## Problems
+
+### 1. Reverse Linked List (Easy)
+```java
+public ListNode reverseList(ListNode head) {
+    ListNode prev = null;
+    while (head != null) {
+        ListNode next = head.next;
+        head.next = prev;
+        prev = head;
+        head = next;
+    }
+    return prev;
+}
+```
+
+### 2. Reverse Between (Medium)
+```java
+public ListNode reverseBetween(ListNode head, int left, int right) {
+    ListNode dummy = new ListNode(0);
+    dummy.next = head;
+    ListNode prev = dummy;
+    
+    for (int i = 0; i < left - 1; i++) {
+        prev = prev.next;
+    }
+    
+    ListNode curr = prev.next;
+    for (int i = 0; i < right - left; i++) {
+        ListNode next = curr.next;
+        curr.next = next.next;
+        next.next = prev.next;
+        prev.next = next;
+    }
+    
+    return dummy.next;
+}
+```
+
+### 3. Reverse K Group (Hard)
+```java
+public ListNode reverseKGroup(ListNode head, int k) {
+    ListNode dummy = new ListNode(0);
+    dummy.next = head;
+    ListNode prev = dummy;
+    
+    while (true) {
+        ListNode kth = getKth(prev, k);
+        if (kth == null) break;
+        
+        ListNode groupNext = kth.next;
+        ListNode curr = prev.next, next;
+        ListNode prevNode = kth.next;
+        
+        while (curr != groupNext) {
+            next = curr.next;
+            curr.next = prevNode;
+            prevNode = curr;
+            curr = next;
+        }
+        
+        ListNode temp = prev.next;
+        prev.next = kth;
+        prev = temp;
+    }
+    
+    return dummy.next;
+}
+
+private ListNode getKth(ListNode curr, int k) {
+    while (curr != null && k > 0) {
+        curr = curr.next;
+        k--;
+    }
+    return curr;
+}
+```
+
+---
+
+## 🏦 Banking Context
+**Scenario**: Reverse transaction history for audit trail.  
+**Solution**: In-place linked list reversal.
+
+---
+
 **Next**: [Pattern: Tree BFS](32-pattern-tree-bfs.md)

@@ -1,21 +1,20 @@
-# Pattern: Cyclic Sort
+# Pattern: Cyclic Sort - Complete Guide
 
 ## Overview
-This pattern describes an interesting approach to deal with problems involving arrays containing numbers in a given range.
+Cyclic Sort places elements at their correct index in O(n) time when dealing with numbers in range [1, n].
 
-## When to use
-*   Input array contains numbers in range `1 to n` or `0 to n`.
-*   Find missing/duplicate numbers.
-*   O(n) time and O(1) space required.
+**Time**: O(n), **Space**: O(1)
+
+---
 
 ## Template
 ```java
-void cyclicSort(int[] nums) {
+public void cyclicSort(int[] nums) {
     int i = 0;
     while (i < nums.length) {
-        int correctIdx = nums[i] - 1; // If 1-based
-        if (nums[i] != nums[correctIdx]) {
-            swap(nums, i, correctIdx);
+        int correctIndex = nums[i] - 1;
+        if (nums[i] != nums[correctIndex]) {
+            swap(nums, i, correctIndex);
         } else {
             i++;
         }
@@ -23,38 +22,53 @@ void cyclicSort(int[] nums) {
 }
 ```
 
-## Interview Problems
+---
 
-### Problem: First Missing Positive (Hard)
-**Pattern**: Cyclic Sort
+## Problems
 
+### 1. Find Missing Number (Easy)
 ```java
-/**
- * Find smallest missing positive integer.
- * Time: O(n)
- * Space: O(1)
- */
-public int firstMissingPositive(int[] nums) {
+public int missingNumber(int[] nums) {
     int i = 0;
     while (i < nums.length) {
-        // Only swap if num is in range [1, n] and not in correct spot
-        if (nums[i] > 0 && nums[i] <= nums.length && nums[nums[i] - 1] != nums[i]) {
-            int correctIdx = nums[i] - 1;
-            int temp = nums[i];
-            nums[i] = nums[correctIdx];
-            nums[correctIdx] = temp;
+        if (nums[i] < nums.length && nums[i] != nums[nums[i]]) {
+            swap(nums, i, nums[i]);
         } else {
             i++;
         }
     }
     
     for (i = 0; i < nums.length; i++) {
-        if (nums[i] != i + 1) return i + 1;
+        if (nums[i] != i) return i;
+    }
+    return nums.length;
+}
+```
+
+### 2. Find All Duplicates (Medium)
+```java
+public List<Integer> findDuplicates(int[] nums) {
+    List<Integer> result = new ArrayList<>();
+    
+    for (int i = 0; i < nums.length; i++) {
+        int index = Math.abs(nums[i]) - 1;
+        if (nums[index] < 0) {
+            result.add(index + 1);
+        } else {
+            nums[index] = -nums[index];
+        }
     }
     
-    return nums.length + 1;
+    return result;
 }
 ```
 
 ---
-**Next**: [Pattern: LinkedList Reversal](31-pattern-linkedlist-reversal.md)
+
+## 🏦 Banking Context
+**Scenario**: Validate sequential transaction IDs.  
+**Solution**: Cyclic sort to find missing or duplicate IDs.
+
+---
+
+**Next**: [Pattern: Linked List Reversal](31-pattern-linkedlist-reversal.md)

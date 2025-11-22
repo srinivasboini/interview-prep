@@ -1,40 +1,71 @@
-# Pattern: Tree DFS
+# Pattern: Tree DFS - Complete Guide
 
 ## Overview
-Recursion to explore all paths.
+Depth-first search using recursion or stack for tree traversal.
 
-## Interview Problems
+**Time**: O(n), **Space**: O(h) where h is height
 
-### Problem: Path Sum II (Medium)
-**Pattern**: DFS with Backtracking
+---
 
+## Template
 ```java
-/**
- * Find all paths summing to target.
- * Time: O(N)
- * Space: O(N)
- */
-public List<List<Integer>> pathSum(TreeNode root, int targetSum) {
-    List<List<Integer>> res = new ArrayList<>();
-    dfs(root, targetSum, new ArrayList<>(), res);
-    return res;
-}
-
-private void dfs(TreeNode node, int target, List<Integer> currentPath, List<List<Integer>> res) {
-    if (node == null) return;
+public void dfs(TreeNode root) {
+    if (root == null) return;
     
-    currentPath.add(node.val);
-    
-    if (node.left == null && node.right == null && target == node.val) {
-        res.add(new ArrayList<>(currentPath));
-    } else {
-        dfs(node.left, target - node.val, currentPath, res);
-        dfs(node.right, target - node.val, currentPath, res);
-    }
-    
-    currentPath.remove(currentPath.size() - 1); // Backtrack
+    // Preorder: process root first
+    System.out.println(root.val);
+    dfs(root.left);
+    dfs(root.right);
 }
 ```
 
 ---
+
+## Problems
+
+### 1. Path Sum (Easy)
+```java
+public boolean hasPathSum(TreeNode root, int targetSum) {
+    if (root == null) return false;
+    if (root.left == null && root.right == null) {
+        return root.val == targetSum;
+    }
+    
+    return hasPathSum(root.left, targetSum - root.val) ||
+           hasPathSum(root.right, targetSum - root.val);
+}
+```
+
+### 2. All Paths (Medium)
+```java
+public List<List<Integer>> allPaths(TreeNode root) {
+    List<List<Integer>> result = new ArrayList<>();
+    dfs(root, new ArrayList<>(), result);
+    return result;
+}
+
+private void dfs(TreeNode node, List<Integer> path, List<List<Integer>> result) {
+    if (node == null) return;
+    
+    path.add(node.val);
+    
+    if (node.left == null && node.right == null) {
+        result.add(new ArrayList<>(path));
+    } else {
+        dfs(node.left, path, result);
+        dfs(node.right, path, result);
+    }
+    
+    path.remove(path.size() - 1);
+}
+```
+
+---
+
+## 🏦 Banking Context
+**Scenario**: Find all approval paths in org hierarchy.  
+**Solution**: DFS to explore all paths from root to leaves.
+
+---
+
 **Next**: [Pattern: Two Heaps](34-pattern-two-heaps.md)

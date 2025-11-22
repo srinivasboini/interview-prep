@@ -1,35 +1,82 @@
-# Pattern: Fast & Slow Pointers
+# Pattern: Fast & Slow Pointers - Complete Guide
 
 ## Overview
-Also known as the Hare & Tortoise algorithm. Uses two pointers moving at different speeds.
+Fast & Slow Pointers (Floyd's Cycle Detection) uses two pointers moving at different speeds to detect cycles or find middle elements.
 
-## When to use
-*   Linked List cycle detection.
-*   Finding middle of Linked List.
-*   Cycle detection in array (Circular Array Loop).
+**Use Cases**: Cycle detection, finding middle, finding kth from end
 
-## Interview Problems
+---
 
-### Problem: Happy Number (Easy)
-**Pattern**: Fast & Slow Pointers (Implicit Cycle)
-
+## Template
 ```java
-/**
- * Determine if n is a happy number.
- * Time: O(log n)
- * Space: O(1)
- */
+public boolean hasCycle(ListNode head) {
+    ListNode slow = head, fast = head;
+    
+    while (fast != null && fast.next != null) {
+        slow = slow.next;
+        fast = fast.next.next;
+        
+        if (slow == fast) return true;
+    }
+    
+    return false;
+}
+```
+
+---
+
+## Problems
+
+### 1. Linked List Cycle (Easy)
+```java
+public boolean hasCycle(ListNode head) {
+    ListNode slow = head, fast = head;
+    while (fast != null && fast.next != null) {
+        slow = slow.next;
+        fast = fast.next.next;
+        if (slow == fast) return true;
+    }
+    return false;
+}
+```
+
+### 2. Find Cycle Start (Medium)
+```java
+public ListNode detectCycle(ListNode head) {
+    ListNode slow = head, fast = head;
+    
+    while (fast != null && fast.next != null) {
+        slow = slow.next;
+        fast = fast.next.next;
+        if (slow == fast) break;
+    }
+    
+    if (fast == null || fast.next == null) return null;
+    
+    slow = head;
+    while (slow != fast) {
+        slow = slow.next;
+        fast = fast.next;
+    }
+    
+    return slow;
+}
+```
+
+### 3. Happy Number (Easy)
+```java
 public boolean isHappy(int n) {
     int slow = n, fast = n;
+    
     do {
-        slow = sumSquare(slow);
-        fast = sumSquare(sumSquare(fast));
+        slow = sumOfSquares(slow);
+        fast = sumOfSquares(sumOfSquares(fast));
     } while (slow != fast);
     
     return slow == 1;
 }
 
-private int sumSquare(int n) {
+private int sumOfSquares(int n) {
     int sum = 0;
     while (n > 0) {
         int digit = n % 10;
@@ -41,4 +88,11 @@ private int sumSquare(int n) {
 ```
 
 ---
+
+## 🏦 Banking Context
+**Scenario**: Detect circular payment chains (money laundering).  
+**Solution**: Fast & slow pointers to detect cycles in transaction graph.
+
+---
+
 **Next**: [Pattern: Merge Intervals](29-pattern-merge-intervals.md)

@@ -1,33 +1,55 @@
-# Company Specific: Google
+# Company-Specific: Google - Interview Guide
 
 ## Overview
-Google is known for **Dynamic Programming**, **Graph Algorithms**, and **Hard** problems. They value finding the *optimal* solution.
-
-## Top Patterns for Google
-1.  **Dynamic Programming**: 2D DP, DP on Trees.
-2.  **Graphs**: Union-Find, Dijkstra, Topological Sort.
-3.  **Recursion**: Complex backtracking.
-
-## Top Questions (Last 6 Months)
-1.  **Race Car** (BFS)
-2.  **Bulls and Cows**
-3.  **Evaluate Division** (Graph)
-4.  **Snapshot Array**
-5.  **Logger Rate Limiter**
-6.  **Text Justification** (Hard String)
-7.  **Maximum Points You Can Obtain from Cards**
-8.  **Detect Squares**
-9.  **Longest Increasing Path in a Matrix**
-10. **Swim in Rising Water**
-
-## Interview Structure
-*   **Phone Screen**: 1 coding question (45 mins).
-*   **Onsite**: 3-4 Coding rounds + 1 System Design + 1 Googleyness (Behavioral).
-
-## Strategy
-*   **Speed**: You need to solve hard problems in 20-30 mins.
-*   **Correctness**: Code must compile and handle edge cases.
-*   **Communication**: Talk through your DP state transitions clearly.
+Google emphasizes algorithmic thinking, optimization, and clean code.
 
 ---
-**Next**: [Company Specific: Microsoft](47-company-specific-microsoft.md)
+
+## Interview Format
+- **Phone Screen**: 1 hour, 1-2 coding problems
+- **Onsite**: 4-5 rounds (all coding/algorithms)
+- **Focus**: Optimal solutions, edge cases, code quality
+
+---
+
+## Frequently Asked Problems
+1. **Longest Substring Without Repeating** - Sliding window
+2. **Median of Two Sorted Arrays** - Binary search
+3. **Trapping Rain Water** - Two pointers
+4. **Word Ladder II** - BFS + backtracking
+5. **Regular Expression Matching** - DP
+6. **Merge K Sorted Lists** - Heap
+7. **Largest Rectangle in Histogram** - Stack
+8. **Alien Dictionary** - Topological sort
+9. **Design Search Autocomplete** - Trie
+10. **Sliding Window Maximum** - Deque
+
+---
+
+## Key Skills
+- **Optimization**: Always find optimal solution
+- **Edge Cases**: Handle all corner cases
+- **Clean Code**: Readable, maintainable
+- **Communication**: Explain thought process
+- **Testing**: Walk through test cases
+
+---
+
+## System Design
+- **Scalability**: Billions of users
+- **Distributed Systems**: Consistency, availability
+- **Google Technologies**: Bigtable, MapReduce, Spanner
+- **Performance**: Latency, throughput
+
+---
+
+## Tips
+- Start with brute force, then optimize
+- Discuss time/space complexity
+- Write clean, production-quality code
+- Test with edge cases
+- Ask clarifying questions
+
+---
+
+**Next**: [Company-Specific: Microsoft](47-company-specific-microsoft.md)

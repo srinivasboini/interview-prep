@@ -1,25 +1,44 @@
-# NeetCode 150 Problems
+# NeetCode 150 Problems - Complete Checklist
 
 ## Overview
-An extension of Blind 75, covering more patterns and edge cases. Highly recommended for Staff/Principal roles where depth is tested.
+NeetCode 150 expands on Blind 75 with 150 problems covering all patterns comprehensively.
 
-*(See Blind 75 for the core. This list adds 75 more problems.)*
+---
 
-### Added Problems
-
-#### Arrays & Hashing
+## Arrays & Hashing (9)
+- [ ] Contains Duplicate
+- [ ] Valid Anagram
+- [ ] Two Sum
+- [ ] Group Anagrams
+- [ ] Top K Frequent Elements
+- [ ] Product of Array Except Self
 - [ ] Valid Sudoku
+- [ ] Encode/Decode Strings
 - [ ] Longest Consecutive Sequence
 
-#### Two Pointers
-- [ ] Two Sum II Input Array Is Sorted
+---
+
+## Two Pointers (5)
+- [ ] Valid Palindrome
+- [ ] Two Sum II
+- [ ] 3Sum
+- [ ] Container With Most Water
 - [ ] Trapping Rain Water
 
-#### Sliding Window
+---
+
+## Sliding Window (6)
+- [ ] Best Time to Buy/Sell Stock
+- [ ] Longest Substring Without Repeating
+- [ ] Longest Repeating Character Replacement
 - [ ] Permutation in String
+- [ ] Minimum Window Substring
 - [ ] Sliding Window Maximum
 
-#### Stack
+---
+
+## Stack (7)
+- [ ] Valid Parentheses
 - [ ] Min Stack
 - [ ] Evaluate Reverse Polish Notation
 - [ ] Generate Parentheses
@@ -27,92 +46,165 @@ An extension of Blind 75, covering more patterns and edge cases. Highly recommen
 - [ ] Car Fleet
 - [ ] Largest Rectangle in Histogram
 
-#### Binary Search
+---
+
+## Binary Search (7)
+- [ ] Binary Search
+- [ ] Search 2D Matrix
 - [ ] Koko Eating Bananas
+- [ ] Find Minimum in Rotated Sorted Array
+- [ ] Search in Rotated Sorted Array
 - [ ] Time Based Key-Value Store
 - [ ] Median of Two Sorted Arrays
 
-#### Linked List
+---
+
+## Linked List (11)
+- [ ] Reverse Linked List
+- [ ] Merge Two Sorted Lists
+- [ ] Reorder List
+- [ ] Remove Nth Node From End
 - [ ] Copy List with Random Pointer
 - [ ] Add Two Numbers
-- [ ] Find the Duplicate Number
+- [ ] Linked List Cycle
+- [ ] Find Duplicate Number
 - [ ] LRU Cache
-- [ ] Reverse Nodes in k-Group
+- [ ] Merge K Sorted Lists
+- [ ] Reverse Nodes in K-Group
 
-#### Trees
-- [ ] Balanced Binary Tree
+---
+
+## Trees (15)
+- [ ] Invert Binary Tree
+- [ ] Maximum Depth
 - [ ] Diameter of Binary Tree
-- [ ] Binary Tree Right Side View
-- [ ] Count Good Nodes in Binary Tree
+- [ ] Balanced Binary Tree
+- [ ] Same Tree
+- [ ] Subtree of Another Tree
+- [ ] Lowest Common Ancestor
+- [ ] Level Order Traversal
+- [ ] Right Side View
+- [ ] Count Good Nodes
+- [ ] Validate BST
+- [ ] Kth Smallest in BST
+- [ ] Construct from Preorder/Inorder
+- [ ] Max Path Sum
+- [ ] Serialize/Deserialize
 
-#### Tries
-- [ ] Design Add and Search Words Data Structure
+---
+
+## Tries (3)
+- [ ] Implement Trie
+- [ ] Design Add/Search Words
 - [ ] Word Search II
 
-#### Heap / Priority Queue
-- [ ] Kth Largest Element in a Stream
+---
+
+## Heap/Priority Queue (7)
+- [ ] Kth Largest in Stream
 - [ ] Last Stone Weight
-- [ ] K Closest Points to Origin
-- [ ] Kth Largest Element in an Array
+- [ ] K Closest Points
+- [ ] Kth Largest Element
 - [ ] Task Scheduler
 - [ ] Design Twitter
+- [ ] Find Median from Stream
 
-#### Backtracking
+---
+
+## Backtracking (9)
 - [ ] Subsets
-- [ ] Subsets II
+- [ ] Combination Sum
 - [ ] Permutations
+- [ ] Subsets II
 - [ ] Combination Sum II
+- [ ] Word Search
 - [ ] Palindrome Partitioning
-- [ ] Letter Combinations of a Phone Number
+- [ ] Letter Combinations
 - [ ] N-Queens
 
-#### Graphs
+---
+
+## Graphs (13)
+- [ ] Number of Islands
+- [ ] Clone Graph
 - [ ] Max Area of Island
-- [ ] Walls and Gates
-- [ ] Rotting Oranges
+- [ ] Pacific Atlantic
 - [ ] Surrounded Regions
+- [ ] Rotting Oranges
+- [ ] Walls and Gates
+- [ ] Course Schedule
 - [ ] Course Schedule II
 - [ ] Redundant Connection
+- [ ] Number of Connected Components
+- [ ] Graph Valid Tree
 - [ ] Word Ladder
 
-#### Advanced Graphs
-- [ ] Reconstruct Itinerary
-- [ ] Min Cost to Connect All Points
-- [ ] Network Delay Time
-- [ ] Cheapest Flights Within K Stops
-- [ ] Swim in Rising Water
+---
 
-#### 1-D DP
+## Advanced Graphs (6)
+- [ ] Reconstruct Itinerary
+- [ ] Min Cost to Connect Points
+- [ ] Network Delay Time
+- [ ] Swim in Rising Water
+- [ ] Alien Dictionary
+- [ ] Cheapest Flights Within K Stops
+
+---
+
+## 1-D DP (12)
+- [ ] Climbing Stairs
 - [ ] Min Cost Climbing Stairs
+- [ ] House Robber
 - [ ] House Robber II
 - [ ] Longest Palindromic Substring
+- [ ] Palindromic Substrings
+- [ ] Decode Ways
+- [ ] Coin Change
+- [ ] Maximum Product Subarray
+- [ ] Word Break
+- [ ] Longest Increasing Subsequence
 - [ ] Partition Equal Subset Sum
 
-#### 2-D DP
+---
+
+## 2-D DP (11)
 - [ ] Unique Paths
 - [ ] Longest Common Subsequence
-- [ ] Best Time to Buy and Sell Stock with Cooldown
+- [ ] Best Time to Buy/Sell with Cooldown
 - [ ] Coin Change II
 - [ ] Target Sum
 - [ ] Interleaving String
-- [ ] Longest Increasing Path in a Matrix
+- [ ] Longest Increasing Path
 - [ ] Distinct Subsequences
 - [ ] Edit Distance
 - [ ] Burst Balloons
 - [ ] Regular Expression Matching
 
-#### Greedy
+---
+
+## Greedy (8)
+- [ ] Maximum Subarray
+- [ ] Jump Game
 - [ ] Jump Game II
 - [ ] Gas Station
 - [ ] Hand of Straights
-- [ ] Merge Triplets to Form Target Triplet
+- [ ] Merge Triplets
 - [ ] Partition Labels
 - [ ] Valid Parenthesis String
 
-#### Intervals
-- [ ] Minimum Interval to Include Each Query
+---
 
-#### Math & Geometry
+## Intervals (6)
+- [ ] Insert Interval
+- [ ] Merge Intervals
+- [ ] Non-overlapping Intervals
+- [ ] Meeting Rooms
+- [ ] Meeting Rooms II
+- [ ] Minimum Interval
+
+---
+
+## Math & Geometry (8)
 - [ ] Rotate Image
 - [ ] Spiral Matrix
 - [ ] Set Matrix Zeroes
@@ -122,7 +214,9 @@ An extension of Blind 75, covering more patterns and edge cases. Highly recommen
 - [ ] Multiply Strings
 - [ ] Detect Squares
 
-#### Bit Manipulation
+---
+
+## Bit Manipulation (7)
 - [ ] Single Number
 - [ ] Number of 1 Bits
 - [ ] Counting Bits
@@ -132,4 +226,24 @@ An extension of Blind 75, covering more patterns and edge cases. Highly recommen
 - [ ] Reverse Integer
 
 ---
-**Next**: [Company Specific: Amazon](45-company-specific-amazon.md)
+
+## 🏦 Banking Priority
+**Must-Know for Finance Interviews**:
+- LRU Cache
+- Merge K Sorted Lists
+- Top K Frequent
+- Median from Stream
+- Course Schedule
+- Coin Change
+- Meeting Rooms II
+- Time Based Key-Value Store
+
+---
+
+**Total**: 150 problems  
+**Estimated Time**: 10-12 weeks  
+**Completion**: Comprehensive interview readiness
+
+---
+
+**Next**: [Company-Specific: Amazon](45-company-specific-amazon.md)

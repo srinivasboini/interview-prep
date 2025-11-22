@@ -1,59 +1,136 @@
-# Pattern: Topological Sort
+# Pattern: Topological Sort - Complete Guide
 
 ## Overview
-Linear ordering of vertices in DAG.
+Order tasks with dependencies using DFS or Kahn's algorithm (BFS).
 
-## Interview Problems
+**Time**: O(V + E), **Space**: O(V)
 
-### Problem: Alien Dictionary (Hard)
-**Pattern**: Topological Sort
+---
 
+## Template (Kahn's Algorithm)
 ```java
-/**
- * Derive order of letters in alien language.
- * Time: O(C) where C is total chars.
- */
-public String alienOrder(String[] words) {
-    Map<Character, List<Character>> adj = new HashMap<>();
-    Map<Character, Integer> counts = new HashMap<>();
-    for (String w : words) {
-        for (char c : w.toCharArray()) {
-            counts.put(c, 0);
-            adj.putIfAbsent(c, new ArrayList<>());
+public int[] topologicalSort(int n, int[][] prerequisites) {
+    int[] indegree = new int[n];
+    List<List<Integer>> graph = new ArrayList<>();
+    
+    for (int i = 0; i < n; i++) {
+        graph.add(new ArrayList<>());
+    }
+    
+    for (int[] pre : prerequisites) {
+        graph.get(pre[1]).add(pre[0]);
+        indegree[pre[0]]++;
+    }
+    
+    Queue<Integer> queue = new LinkedList<>();
+    for (int i = 0; i < n; i++) {
+        if (indegree[i] == 0) {
+            queue.offer(i);
         }
     }
     
-    for (int i = 0; i < words.length - 1; i++) {
-        String w1 = words[i], w2 = words[i+1];
-        if (w1.length() > w2.length() && w1.startsWith(w2)) return "";
-        for (int j = 0; j < Math.min(w1.length(), w2.length()); j++) {
-            if (w1.charAt(j) != w2.charAt(j)) {
-                adj.get(w1.charAt(j)).add(w2.charAt(j));
-                counts.put(w2.charAt(j), counts.get(w2.charAt(j)) + 1);
-                break;
+    int[] result = new int[n];
+    int index = 0;
+    
+    while (!queue.isEmpty()) {
+        int node = queue.poll();
+        result[index++] = node;
+        
+        for (int neighbor : graph.get(node)) {
+            if (--indegree[neighbor] == 0) {
+                queue.offer(neighbor);
             }
         }
     }
     
-    StringBuilder sb = new StringBuilder();
-    Queue<Character> q = new LinkedList<>();
-    for (char c : counts.keySet()) {
-        if (counts.get(c) == 0) q.offer(c);
-    }
-    
-    while (!q.isEmpty()) {
-        char c = q.poll();
-        sb.append(c);
-        for (char next : adj.get(c)) {
-            counts.put(next, counts.get(next) - 1);
-            if (counts.get(next) == 0) q.offer(next);
-        }
-    }
-    
-    if (sb.length() < counts.size()) return "";
-    return sb.toString();
+    return index == n ? result : new int[0];
 }
 ```
 
 ---
-**Next**: [Problem Lists](40-leetcode-easy-problems.md)
+
+## Problems
+
+### 1. Course Schedule (Medium)
+```java
+public boolean canFinish(int numCourses, int[][] prerequisites) {
+    int[] indegree = new int[numCourses];
+    List<List<Integer>> graph = new ArrayList<>();
+    
+    for (int i = 0; i < numCourses; i++) {
+        graph.add(new ArrayList<>());
+    }
+    
+    for (int[] pre : prerequisites) {
+        graph.get(pre[1]).add(pre[0]);
+        indegree[pre[0]]++;
+    }
+    
+    Queue<Integer> queue = new LinkedList<>();
+    for (int i = 0; i < numCourses; i++) {
+        if (indegree[i] == 0) queue.offer(i);
+    }
+    
+    int count = 0;
+    while (!queue.isEmpty()) {
+        int course = queue.poll();
+        count++;
+        
+        for (int next : graph.get(course)) {
+            if (--indegree[next] == 0) {
+                queue.offer(next);
+            }
+        }
+    }
+    
+    return count == numCourses;
+}
+```
+
+### 2. Course Schedule II (Medium)
+```java
+public int[] findOrder(int numCourses, int[][] prerequisites) {
+    int[] indegree = new int[numCourses];
+    List<List<Integer>> graph = new ArrayList<>();
+    
+    for (int i = 0; i < numCourses; i++) {
+        graph.add(new ArrayList<>());
+    }
+    
+    for (int[] pre : prerequisites) {
+        graph.get(pre[1]).add(pre[0]);
+        indegree[pre[0]]++;
+    }
+    
+    Queue<Integer> queue = new LinkedList<>();
+    for (int i = 0; i < numCourses; i++) {
+        if (indegree[i] == 0) queue.offer(i);
+    }
+    
+    int[] result = new int[numCourses];
+    int index = 0;
+    
+    while (!queue.isEmpty()) {
+        int course = queue.poll();
+        result[index++] = course;
+        
+        for (int next : graph.get(course)) {
+            if (--indegree[next] == 0) {
+                queue.offer(next);
+            }
+        }
+    }
+    
+    return index == numCourses ? result : new int[0];
+}
+```
+
+---
+
+## 🏦 Banking Context
+**Scenario**: Order payment processing tasks with dependencies.  
+**Solution**: Topological sort to determine execution order.
+
+---
+
+**Next**: [LeetCode Easy Problems](40-leetcode-easy-problems.md)

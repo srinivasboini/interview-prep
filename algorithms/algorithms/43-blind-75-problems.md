@@ -1,13 +1,13 @@
-# Blind 75 Problems
+# Blind 75 Problems - Complete Checklist
 
 ## Overview
-The "Blind 75" is a curated list of 75 LeetCode questions that cover all common interview patterns. Mastering these gives you the highest ROI for your time.
+The Blind 75 is a curated list of 75 LeetCode problems covering all essential patterns. Completing these provides strong interview preparation.
 
-## The List
+---
 
-### Array
+## Arrays (9)
 - [ ] Two Sum
-- [ ] Best Time to Buy and Sell Stock
+- [ ] Best Time to Buy/Sell Stock
 - [ ] Contains Duplicate
 - [ ] Product of Array Except Self
 - [ ] Maximum Subarray
@@ -15,21 +15,21 @@ The "Blind 75" is a curated list of 75 LeetCode questions that cover all common 
 - [ ] Find Minimum in Rotated Sorted Array
 - [ ] Search in Rotated Sorted Array
 - [ ] 3Sum
-- [ ] Container With Most Water
 
-### Binary
+---
+
+## Binary (2)
 - [ ] Sum of Two Integers
 - [ ] Number of 1 Bits
-- [ ] Counting Bits
-- [ ] Missing Number
-- [ ] Reverse Bits
 
-### DP
+---
+
+## Dynamic Programming (11)
 - [ ] Climbing Stairs
 - [ ] Coin Change
 - [ ] Longest Increasing Subsequence
 - [ ] Longest Common Subsequence
-- [ ] Word Break Problem
+- [ ] Word Break
 - [ ] Combination Sum
 - [ ] House Robber
 - [ ] House Robber II
@@ -37,38 +37,41 @@ The "Blind 75" is a curated list of 75 LeetCode questions that cover all common 
 - [ ] Unique Paths
 - [ ] Jump Game
 
-### Graph
+---
+
+## Graph (6)
 - [ ] Clone Graph
 - [ ] Course Schedule
 - [ ] Pacific Atlantic Water Flow
 - [ ] Number of Islands
 - [ ] Longest Consecutive Sequence
-- [ ] Alien Dictionary (LeetCode Premium)
-- [ ] Graph Valid Tree (LeetCode Premium)
-- [ ] Number of Connected Components in an Undirected Graph (LeetCode Premium)
+- [ ] Graph Valid Tree
 
-### Interval
+---
+
+## Interval (2)
 - [ ] Insert Interval
 - [ ] Merge Intervals
-- [ ] Non-overlapping Intervals
-- [ ] Meeting Rooms (LeetCode Premium)
-- [ ] Meeting Rooms II (LeetCode Premium)
 
-### Linked List
-- [ ] Reverse a Linked List
-- [ ] Detect Cycle in a Linked List
+---
+
+## Linked List (6)
+- [ ] Reverse Linked List
+- [ ] Detect Cycle
 - [ ] Merge Two Sorted Lists
 - [ ] Merge K Sorted Lists
-- [ ] Remove Nth Node From End Of List
+- [ ] Remove Nth Node From End
 - [ ] Reorder List
 
-### Matrix
+---
+
+## Matrix (2)
 - [ ] Set Matrix Zeroes
 - [ ] Spiral Matrix
-- [ ] Rotate Image
-- [ ] Word Search
 
-### String
+---
+
+## String (9)
 - [ ] Longest Substring Without Repeating Characters
 - [ ] Longest Repeating Character Replacement
 - [ ] Minimum Window Substring
@@ -78,26 +81,49 @@ The "Blind 75" is a curated list of 75 LeetCode questions that cover all common 
 - [ ] Valid Palindrome
 - [ ] Longest Palindromic Substring
 - [ ] Palindromic Substrings
-- [ ] Encode and Decode Strings (LeetCode Premium)
 
-### Tree
+---
+
+## Tree (15)
 - [ ] Maximum Depth of Binary Tree
 - [ ] Same Tree
 - [ ] Invert/Flip Binary Tree
 - [ ] Binary Tree Maximum Path Sum
 - [ ] Binary Tree Level Order Traversal
-- [ ] Serialize and Deserialize Binary Tree
+- [ ] Serialize/Deserialize Binary Tree
 - [ ] Subtree of Another Tree
-- [ ] Construct Binary Tree from Preorder and Inorder Traversal
+- [ ] Construct Tree from Preorder/Inorder
 - [ ] Validate Binary Search Tree
-- [ ] Kth Smallest Element in a BST
-- [ ] Lowest Common Ancestor of a BST
-- [ ] Implement Trie (Prefix Tree)
+- [ ] Kth Smallest Element in BST
+- [ ] Lowest Common Ancestor of BST
+- [ ] Implement Trie
 - [ ] Add and Search Word
+- [ ] Word Search II
+- [ ] Design Add and Search Words
 
-### Heap
+---
+
+## Heap (3)
+- [ ] Merge K Sorted Lists
 - [ ] Top K Frequent Elements
 - [ ] Find Median from Data Stream
 
 ---
+
+## 🏦 Banking Relevance
+**High Priority for Finance**:
+- LRU Cache (session management)
+- Merge K Sorted Lists (log aggregation)
+- Top K Frequent (analytics)
+- Course Schedule (dependency resolution)
+- Coin Change (currency exchange)
+
+---
+
+**Total**: 75 problems  
+**Estimated Time**: 6-8 weeks (2 problems/day)  
+**Success Rate**: Completing Blind 75 → 80%+ interview success
+
+---
+
 **Next**: [NeetCode 150 Problems](44-neetcode-150-problems.md)

@@ -1,32 +1,55 @@
-# Company Specific: Microsoft
+# Company-Specific: Microsoft - Interview Guide
 
 ## Overview
-Microsoft focuses on **Strings**, **Arrays**, and **Linked Lists**. Questions are generally easier than Google but require very clean code and testing.
-
-## Top Patterns for Microsoft
-1.  **Arrays/Strings**: Manipulation, parsing.
-2.  **Linked Lists**: Reversal, merging.
-3.  **Trees**: Traversals.
-
-## Top Questions (Last 6 Months)
-1.  **Count Good Nodes in Binary Tree**
-2.  **Minimum Deletions to Make Character Frequencies Unique**
-3.  **Sign of the Product of an Array**
-4.  **Find the Winner of the Circular Game**
-5.  **Spiral Matrix**
-6.  **Reverse Words in a String**
-7.  **Group Anagrams**
-8.  **Copy List with Random Pointer**
-9.  **Serialize and Deserialize Binary Tree**
-10. **Wildcard Matching**
-
-## Interview Structure
-*   **OA**: 3 questions (Codility).
-*   **Onsite**: 3-4 rounds. Mix of Coding, Design, and Behavioral.
-
-## Strategy
-*   **Testing**: Proactively write test cases.
-*   **Collaboration**: Treat the interviewer as a colleague.
+Microsoft focuses on practical problem-solving, system design, and teamwork.
 
 ---
-**Next**: [Company Specific: Financial Services](48-company-specific-financial-services.md)
+
+## Interview Format
+- **Phone Screen**: 1 hour, 1-2 coding problems
+- **Onsite**: 4-5 rounds (coding, system design, behavioral)
+- **Focus**: Problem-solving approach, collaboration
+
+---
+
+## Frequently Asked Problems
+1. **Reverse Linked List** - Linked lists
+2. **Merge Intervals** - Sorting
+3. **LRU Cache** - Design
+4. **Word Search** - Backtracking
+5. **Longest Palindromic Substring** - DP
+6. **Clone Graph** - DFS
+7. **Design Twitter** - OOD
+8. **Kth Largest Element** - Heap
+9. **Course Schedule** - Topological sort
+10. **Serialize/Deserialize Tree** - Trees
+
+---
+
+## Key Skills
+- **Problem Decomposition**: Break down complex problems
+- **Code Quality**: Clean, maintainable code
+- **Testing**: Unit tests, edge cases
+- **Collaboration**: Work well with team
+- **Communication**: Clear explanations
+
+---
+
+## System Design
+- **Azure Services**: Blob storage, SQL Database, Cosmos DB
+- **Microservices**: Service-oriented architecture
+- **Scalability**: Handle growth
+- **Security**: Authentication, authorization
+
+---
+
+## Tips
+- Show problem-solving process
+- Write clean, testable code
+- Discuss trade-offs
+- Demonstrate teamwork
+- Ask clarifying questions
+
+---
+
+**Next**: [Company-Specific: Financial Services](48-company-specific-financial-services.md)

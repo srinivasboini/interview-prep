@@ -1,34 +1,92 @@
-# Pattern: Top K Elements
+# Pattern: Top K Elements - Complete Guide
 
 ## Overview
-Find K largest/smallest/frequent elements. Use Heap or QuickSelect.
+Find top K elements using heap or quickselect.
 
-## Interview Problems
+**Time**: O(n log k) heap, O(n) average quickselect  
+**Space**: O(k)
 
-### Problem: Top K Frequent Elements (Medium)
-**Pattern**: Min Heap or Bucket Sort
+---
 
+## Template
 ```java
-/**
- * Find k most frequent elements.
- * Time: O(N log k)
- */
 public int[] topKFrequent(int[] nums, int k) {
     Map<Integer, Integer> count = new HashMap<>();
-    for (int n : nums) count.put(n, count.getOrDefault(n, 0) + 1);
-    
-    PriorityQueue<Integer> heap = new PriorityQueue<>((a, b) -> count.get(a) - count.get(b));
-    
-    for (int n : count.keySet()) {
-        heap.offer(n);
-        if (heap.size() > k) heap.poll();
+    for (int num : nums) {
+        count.put(num, count.getOrDefault(num, 0) + 1);
     }
     
-    int[] res = new int[k];
-    for (int i = 0; i < k; i++) res[i] = heap.poll();
-    return res;
+    PriorityQueue<Integer> heap = new PriorityQueue<>(
+        (a, b) -> count.get(a) - count.get(b)
+    );
+    
+    for (int num : count.keySet()) {
+        heap.offer(num);
+        if (heap.size() > k) {
+            heap.poll();
+        }
+    }
+    
+    int[] result = new int[k];
+    for (int i = 0; i < k; i++) {
+        result[i] = heap.poll();
+    }
+    
+    return result;
 }
 ```
 
 ---
-**Next**: [Pattern: K-Way Merge](38-pattern-k-way-merge.md)
+
+## Problems
+
+### 1. Kth Largest Element (Medium)
+```java
+public int findKthLargest(int[] nums, int k) {
+    PriorityQueue<Integer> heap = new PriorityQueue<>();
+    
+    for (int num : nums) {
+        heap.offer(num);
+        if (heap.size() > k) {
+            heap.poll();
+        }
+    }
+    
+    return heap.peek();
+}
+```
+
+### 2. Top K Frequent Elements (Medium)
+```java
+public int[] topKFrequent(int[] nums, int k) {
+    Map<Integer, Integer> count = new HashMap<>();
+    for (int num : nums) {
+        count.put(num, count.getOrDefault(num, 0) + 1);
+    }
+    
+    PriorityQueue<Integer> heap = new PriorityQueue<>(
+        (a, b) -> count.get(a) - count.get(b)
+    );
+    
+    for (int num : count.keySet()) {
+        heap.offer(num);
+        if (heap.size() > k) heap.poll();
+    }
+    
+    int[] result = new int[k];
+    for (int i = 0; i < k; i++) {
+        result[i] = heap.poll();
+    }
+    return result;
+}
+```
+
+---
+
+## 🏦 Banking Context
+**Scenario**: Find top K most active trading accounts.  
+**Solution**: Min heap of size K for efficient tracking.
+
+---
+
+**Next**: [Pattern: K-way Merge](38-pattern-k-way-merge.md)

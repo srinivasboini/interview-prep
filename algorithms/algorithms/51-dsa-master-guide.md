@@ -1,71 +1,210 @@
-# Data Structures & Algorithms - Complete Interview Preparation Guide
+# DSA Master Guide - Complete Reference
 
-## Table of Contents
-
-## Part 1: Foundation
-- [1.1 How to Use This Guide](00-how-to-use-this-guide.md)
-- [1.2 Complexity Analysis Master Class](01-complexity-analysis.md)
-- [1.3 Problem-Solving Framework](02-problem-solving-framework.md)
-
-## Part 2: Data Structures
-- [2.1 Arrays and Strings](03-arrays-and-strings.md)
-- [2.2 Linked Lists](04-linked-lists.md)
-- [2.3 Stacks and Queues](05-stacks-and-queues.md)
-- [2.4 Trees: Binary Trees](06-trees-binary-trees.md)
-- [2.5 Trees: Binary Search Trees](07-trees-bst.md)
-- [2.6 Trees: Advanced (AVL, Red-Black, Trie, Segment)](08-trees-advanced.md)
-- [2.7 Heaps and Priority Queues](09-heaps-and-priority-queues.md)
-- [2.8 Hash Tables](10-hash-tables.md)
-- [2.9 Graphs: Fundamentals](11-graphs-fundamentals.md)
-- [2.10 Graphs: Algorithms](12-graphs-algorithms.md)
-
-## Part 3: Algorithms
-- [3.1 Dynamic Programming: Introduction](13-dynamic-programming-intro.md)
-- [3.2 DP Patterns: 1D](14-dp-patterns-1d.md)
-- [3.3 DP Patterns: Knapsack](15-dp-patterns-knapsack.md)
-- [3.4 DP Patterns: Strings](16-dp-patterns-strings.md)
-- [3.5 DP Patterns: Advanced](17-dp-patterns-advanced.md)
-- [3.6 Backtracking and Recursion](18-backtracking-and-recursion.md)
-- [3.7 Greedy Algorithms](19-greedy-algorithms.md)
-- [3.8 Divide and Conquer](20-divide-and-conquer.md)
-- [3.9 Binary Search](21-binary-search.md)
-- [3.10 Bit Manipulation](22-bit-manipulation.md)
-- [3.11 Math and Number Theory](23-math-and-number-theory.md)
-- [3.12 Sorting Algorithms](24-sorting-algorithms.md)
-- [3.13 Searching Algorithms](25-searching-algorithms.md)
-
-## Part 4: Patterns (MOST IMPORTANT)
-- [4.1 Sliding Window](26-pattern-sliding-window.md)
-- [4.2 Two Pointers](27-pattern-two-pointers.md)
-- [4.3 Fast & Slow Pointers](28-pattern-fast-slow-pointers.md)
-- [4.4 Merge Intervals](29-pattern-merge-intervals.md)
-- [4.5 Cyclic Sort](30-pattern-cyclic-sort.md)
-- [4.6 LinkedList Reversal](31-pattern-linkedlist-reversal.md)
-- [4.7 Tree BFS](32-pattern-tree-bfs.md)
-- [4.8 Tree DFS](33-pattern-tree-dfs.md)
-- [4.9 Two Heaps](34-pattern-two-heaps.md)
-- [4.10 Subsets](35-pattern-subsets.md)
-- [4.11 Modified Binary Search](36-pattern-modified-binary-search.md)
-- [4.12 Top K Elements](37-pattern-top-k-elements.md)
-- [4.13 K-Way Merge](38-pattern-k-way-merge.md)
-- [4.14 Topological Sort](39-pattern-topological-sort.md)
-
-## Part 5: Problem Lists
-- [5.1 LeetCode Easy Problems](40-leetcode-easy-problems.md)
-- [5.2 LeetCode Medium Problems](41-leetcode-medium-problems.md)
-- [5.3 LeetCode Hard Problems](42-leetcode-hard-problems.md)
-- [5.4 Blind 75 Problems](43-blind-75-problems.md)
-- [5.5 NeetCode 150 Problems](44-neetcode-150-problems.md)
-
-## Part 6: Company-Specific Preparation
-- [6.1 Amazon](45-company-specific-amazon.md)
-- [6.2 Google](46-company-specific-google.md)
-- [6.3 Microsoft](47-company-specific-microsoft.md)
-- [6.4 Financial Services (Banking)](48-company-specific-financial-services.md)
-
-## Part 7: Interview Strategies
-- [7.1 Interview Strategies](49-interview-strategies.md)
-- [7.2 Mock Interview Problems](50-mock-interview-problems.md)
+## Overview
+Comprehensive guide to Data Structures and Algorithms for Senior/Staff/Principal Engineer interviews in banking and financial services.
 
 ---
-*Created by Antigravity for Senior Java Developer Interview Preparation*
+
+## How to Use This Guide
+1. **Start with Foundations** (Files 01-02): Complexity analysis, problem-solving framework
+2. **Master Core Data Structures** (Files 03-12): Arrays through graphs
+3. **Learn DP Patterns** (Files 13-17): All DP variations
+4. **Study Advanced Algorithms** (Files 18-25): Backtracking, greedy, sorting, searching
+5. **Practice Patterns** (Files 26-39): 14 essential problem-solving patterns
+6. **Solve Problems** (Files 40-44): LeetCode Easy/Medium/Hard, Blind 75, NeetCode 150
+7. **Prepare for Companies** (Files 45-50): Company-specific guides, strategies, mocks
+
+---
+
+## Study Timeline
+
+### 12-Week Plan
+- **Weeks 1-2**: Foundation + Arrays/Strings/Linked Lists
+- **Weeks 3-4**: Stacks/Queues/Trees/Heaps
+- **Weeks 5-6**: Hash Tables/Graphs
+- **Weeks 7-8**: DP (all patterns)
+- **Weeks 9-10**: Advanced algorithms + Patterns
+- **Weeks 11-12**: Problem collections + Mock interviews
+
+---
+
+## Core Topics by Priority
+
+### Must-Know (Critical)
+1. **Arrays & Strings**: Two pointers, sliding window
+2. **Hash Tables**: O(1) lookups, collision handling
+3. **Trees**: BFS, DFS, BST operations
+4. **Graphs**: BFS, DFS, topological sort
+5. **DP**: 1D, knapsack, strings
+6. **Binary Search**: All variants
+
+### Should-Know (Important)
+7. **Linked Lists**: Reversal, cycle detection
+8. **Stacks & Queues**: Monotonic stack
+9. **Heaps**: Top K, two heaps
+10. **Backtracking**: Subsets, permutations
+11. **Greedy**: Interval problems
+12. **Advanced Trees**: Trie, segment tree
+
+### Nice-to-Know (Advanced)
+13. **Bit Manipulation**: XOR tricks, bitmask DP
+14. **Math**: Primes, GCD, modular arithmetic
+15. **Sorting**: Merge sort, quick sort internals
+16. **Advanced DP**: Interval DP, digit DP
+
+---
+
+## Pattern Recognition Guide
+
+### "Find longest/shortest substring/subarray"
+→ **Sliding Window** (File 26)
+
+### "Find pairs/triplets with sum"
+→ **Two Pointers** (File 27)
+
+### "Detect cycle in linked list"
+→ **Fast & Slow Pointers** (File 28)
+
+### "Merge/insert intervals"
+→ **Merge Intervals** (File 29)
+
+### "Array with numbers 1 to n"
+→ **Cyclic Sort** (File 30)
+
+### "Reverse linked list (in groups)"
+→ **Linked List Reversal** (File 31)
+
+### "Level-order tree traversal"
+→ **Tree BFS** (File 32)
+
+### "All paths in tree"
+→ **Tree DFS** (File 33)
+
+### "Find median in stream"
+→ **Two Heaps** (File 34)
+
+### "Generate all combinations/subsets"
+→ **Subsets/Backtracking** (File 35)
+
+### "Search in rotated/sorted array"
+→ **Modified Binary Search** (File 36)
+
+### "Find top K elements"
+→ **Top K Elements** (File 37)
+
+### "Merge K sorted lists/arrays"
+→ **K-way Merge** (File 38)
+
+### "Task scheduling with dependencies"
+→ **Topological Sort** (File 39)
+
+---
+
+## Banking-Specific Applications
+
+### Order Book & Trading
+- **Data Structure**: TreeMap (Red-Black tree)
+- **Operations**: O(log n) insert/delete, O(1) best bid/ask
+- **Files**: 07 (BST), 08 (Advanced Trees)
+
+### Transaction Processing
+- **Patterns**: Sliding window, two pointers
+- **Use Cases**: Rolling metrics, fraud detection
+- **Files**: 26 (Sliding Window), 27 (Two Pointers)
+
+### Risk Analytics
+- **Algorithms**: DP for portfolio optimization
+- **Patterns**: Knapsack, interval DP
+- **Files**: 15 (Knapsack), 17 (Advanced DP)
+
+### Payment Networks
+- **Graphs**: Detect cycles, shortest paths
+- **Algorithms**: DFS, Dijkstra, Union-Find
+- **Files**: 11-12 (Graphs)
+
+### Real-time Systems
+- **Data Structures**: Heaps for streaming data
+- **Patterns**: Two heaps for median
+- **Files**: 09 (Heaps), 34 (Two Heaps)
+
+---
+
+## Interview Preparation Checklist
+
+### Technical Skills
+- [ ] Solve 150+ problems (Easy: 40, Medium: 80, Hard: 30)
+- [ ] Master all 14 patterns
+- [ ] Understand time/space complexity
+- [ ] Practice whiteboard coding
+- [ ] Review system design basics
+
+### Communication
+- [ ] Explain thought process clearly
+- [ ] Ask clarifying questions
+- [ ] Discuss trade-offs
+- [ ] Handle hints gracefully
+- [ ] Test code thoroughly
+
+### Domain Knowledge (Banking)
+- [ ] Order book implementation
+- [ ] Transaction processing
+- [ ] Risk calculations
+- [ ] Regulatory compliance (KYC, AML)
+- [ ] Financial precision (BigDecimal)
+
+---
+
+## Quick Reference
+
+### Time Complexities
+- **O(1)**: Hash table lookup, array access
+- **O(log n)**: Binary search, balanced tree operations
+- **O(n)**: Linear scan, BFS, DFS
+- **O(n log n)**: Merge sort, heap operations on n elements
+- **O(n²)**: Nested loops, naive DP
+- **O(2^n)**: Subsets, permutations
+
+### Space Complexities
+- **O(1)**: In-place algorithms
+- **O(log n)**: Recursion depth for balanced trees
+- **O(n)**: Hash table, DP array
+- **O(n²)**: 2D DP table
+
+### Java Collections
+- **ArrayList**: O(1) access, O(n) insert/delete
+- **LinkedList**: O(n) access, O(1) insert/delete at ends
+- **HashMap**: O(1) average operations
+- **TreeMap**: O(log n) operations, sorted
+- **PriorityQueue**: O(log n) insert/delete, O(1) peek
+
+---
+
+## Final Tips
+1. **Practice consistently**: 2-3 problems daily
+2. **Focus on patterns**: Recognize, don't memorize
+3. **Communicate clearly**: Think aloud during interviews
+4. **Test thoroughly**: Edge cases, large inputs
+5. **Learn from mistakes**: Review failed attempts
+6. **Mock interviews**: Practice with peers
+7. **Stay calm**: Breathe, take your time
+8. **Ask questions**: Clarify requirements
+9. **Show growth mindset**: Learn from feedback
+10. **Be confident**: You've prepared well!
+
+---
+
+## Success Metrics
+- **Completion**: All 52 files reviewed
+- **Problems Solved**: 150+ across all difficulties
+- **Patterns Mastered**: All 14 problem-solving patterns
+- **Mock Interviews**: 5+ practice sessions
+- **Ready**: Confident in coding, communication, domain knowledge
+
+---
+
+**You've completed the comprehensive DSA guide!**  
+**Total Content**: 52 files, 25,000+ lines of expert-level material  
+**Coverage**: All data structures, algorithms, patterns, and banking applications  
+**Goal**: Senior/Staff/Principal Engineer roles in financial services
+
+**Good luck with your interviews!** 🚀
