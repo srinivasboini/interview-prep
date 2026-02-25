@@ -15953,3 +15953,954 @@ Good luck with your interviews!
 
 *End of Complete Guide*
 
+
+---
+
+## 3.8 Shenandoah GC
+
+### Overview
+
+Shenandoah is an ultra-low-latency garbage collector developed by Red Hat, available in OpenJDK 12+. Unlike G1, which stops all threads during evacuation (moving live objects), Shenandoah performs **concurrent evacuation** — it moves objects while application threads continue running.
+
+**Key Differentiator**: G1 has concurrent marking but stop-the-world evacuation. Shenandoah has concurrent marking AND concurrent evacuation. Pause times are typically **sub-10ms**, regardless of heap size.
+
+### How Shenandoah Works
+
+```mermaid
+graph LR
+    A[Initial Mark\nSTW - short] --> B[Concurrent Mark\nApplication runs]
+    B --> C[Final Mark\nSTW - short]
+    C --> D[Concurrent Cleanup\nApplication runs]
+    D --> E[Concurrent Evacuation\nApplication runs! 🔑]
+    E --> F[Init Update Refs\nSTW - very short]
+    F --> G[Concurrent Update Refs\nApplication runs]
+    G --> H[Final Update Refs\nSTW - very short]
+```
+
+**The Key Innovation — Brooks Forwarding Pointers**:
+Shenandoah adds an indirection pointer (forwarding pointer) to every object. When an object is moved, the old location's forwarding pointer is updated to point to the new location. Application threads chase the forwarding pointer transparently.
+
+```
+Before evacuation:
+    [A] → [Object Header | Data]
+                ↓ forwarding ptr
+          [Object Header | Data]  (self-pointer)
+
+During/after concurrent evacuation:
+    [A] → [Object Header | | → NEW LOCATION]
+                                ↓
+                         [Object Header | Data]  (moved object)
+```
+
+### When to Use Shenandoah
+
+| Scenario | Shenandoah? | Notes |
+|----------|------------|-------|
+| Large heaps (>16GB) needing low latency | ✅ Excellent | Pause time doesn't grow with heap |
+| Real-time transaction APIs | ✅ Excellent | Consistent sub-10ms pauses |
+| Batch processing prioritizing throughput | ❌ Not ideal | ZGC/G1 better throughput |
+| HotSpot JDK (Oracle) | ❌ Not available | OpenJDK only |
+
+### Configuration
+
+```bash
+# Enable Shenandoah GC
+-XX:+UseShenandoahGC
+
+# Heuristics control when/how aggressively to GC
+-XX:ShenandoahGCHeuristics=adaptive    # Default: adapts to allocation rate
+-XX:ShenandoahGCHeuristics=compact     # More aggressive, good for low-memory
+-XX:ShenandoahGCHeuristics=static      # Fixed thresholds
+
+# Pacing — slow down mutators if GC is falling behind
+-XX:ShenandoahPacingMaxDelay=10        # Max delay in ms for pacing (default 10)
+
+# Heap sizing
+-Xms4g -Xmx4g                          # Fixed heap recommended for low latency
+```
+
+### Interview Q&A
+
+**Q: How is Shenandoah different from ZGC?**
+> "Both target sub-millisecond pauses and concurrent evacuation. Key differences:
+> - **Shenandoah** uses Brooks forwarding pointers (extra word per object) — reads can chase the pointer
+> - **ZGC** uses colored pointers (encodes GC metadata in pointer bits) — no extra object overhead
+> - ZGC has better throughput efficiency; Shenandoah had earlier production readiness
+> - ZGC now has Generational ZGC (Java 21+); Shenandoah doesn't have generational mode
+> - Shenandoah is OpenJDK-only; ZGC is in HotSpot (Oracle + OpenJDK)"
+
+---
+
+## 3.9 Epsilon GC
+
+### Overview
+
+Epsilon is a **no-op garbage collector** — it allocates memory but **never collects**. When the heap is exhausted, the JVM exits with `OutOfMemoryError`.
+
+**Primary Use Cases**:
+1. **Performance testing**: Measure allocation overhead without GC interference
+2. **Extremely short-lived programs**: Lambda functions, CLI tools that live for seconds
+3. **Memory allocation benchmarking**: Compare allocation rates across implementations
+4. **Testing GC interfaces**: Verify apps work with any GC before adding real collectors
+
+```bash
+# Enable Epsilon GC (Java 11+)
+-XX:+UnlockExperimentalVMOptions
+-XX:+UseEpsilonGC
+
+# In banking, useful for:
+# 1. Batch jobs with bounded memory that complete fast
+# 2. Performance benchmarks isolating GC from measurements
+# 3. Testing: "does this code even allocate?"
+```
+
+### When NOT to Use Epsilon
+
+- **Never in production long-running services** — heap will fill up and JVM dies
+- **Not for applications with unknown memory bounds** — unpredictable OOM
+- Its value is diagnostic and benchmark-only
+
+---
+
+## 3.10 GC Tuning and Troubleshooting
+
+### GC Log Analysis
+
+Enable detailed GC logging (Java 9+ unified logging):
+
+```bash
+# Comprehensive GC logging
+-Xlog:gc*:file=/var/log/app/gc.log:time,uptime,level,tags:filecount=10,filesize=50m
+
+# Key log patterns to watch:
+# [gc] GC(0) Pause Young (Normal) (G1 Evacuation Pause) ... 45.231ms   ← Young GC pause
+# [gc] GC(12) Pause Full (Ergonomics) ... 3421.122ms                   ← Full GC - BAD
+# [gc] Heap: 7168M(7168M)->6890M(7168M)                                ← heap usage
+```
+
+### GC Diagnostic Commands
+
+```bash
+# Real-time GC stats (while app runs)
+jstat -gc <pid> 1000      # Every 1 second
+# S0C  S1C  S0U  S1U    EC      EU      OC       OU     MC     MU   CCSC CCSU  YGC  YGCT  FGC  FGCT   GCT
+# 0.0  512  0.0  256  4096.0  2048.0  8192.0  7800.0  60000  58000  ...   10  2.1s   0   0.0  2.1s
+
+# jstat column reference:
+# YGC/YGCT - Young GC count/total time
+# FGC/FGCT - Full GC count/total time (want FGC=0 ideally)
+# OC/OU    - Old capacity/used (watch OU approaching OC)
+
+# Heap histogram (find largest object types)
+jmap -histo <pid> | head -30
+
+# Heap dump for analysis
+jmap -dump:format=b,file=/tmp/heap.hprof <pid>
+# Analyze with Eclipse Memory Analyzer (MAT) or VisualVM
+
+# Thread dump (find blocking threads)
+jstack <pid>
+
+# GC overhead in one command
+jcmd <pid> GC.heap_info
+```
+
+### Common GC Problems and Solutions
+
+```
+PROBLEM 1: Frequent Full GCs (FGC > 0 in jstat)
+─────────────────────────────────────────────────
+Symptoms: Long pauses (seconds), CPU spike, latency spikes
+Causes:
+  - Old generation is too small for live data
+  - Memory leak (objects never becoming unreachable)
+  - Too many long-lived objects → promotion pressure
+
+Solutions:
+  1. Increase -Xmx (if genuinely need more memory)
+  2. Increase old generation ratio: -XX:NewRatio=1 (50% young, 50% old)
+  3. Check for memory leaks: heap dump + MAT analysis
+  4. Review object lifecycle: are cached collections unbounded?
+
+PROBLEM 2: High Young GC Frequency
+────────────────────────────────────
+Symptoms: Fine latency but high CPU, many minor GCs per second
+Causes:
+  - Eden too small for allocation rate
+  - Too many short-lived objects
+
+Solutions:
+  -Xmn4g (increase young generation)
+  Review allocation: StringBuilder in loops? Temp objects?
+  Profile with Java Flight Recorder
+
+PROBLEM 3: GC Overhead Limit Exceeded
+───────────────────────────────────────
+java.lang.OutOfMemoryError: GC overhead limit exceeded
+JVM spent >98% of time in GC, recovering <2% of heap
+
+Solutions:
+  1. -XX:-UseGCOverheadLimit (suppress — not recommended)
+  2. Increase heap: -Xmx
+  3. Fix memory leak
+  4. Optimize allocation patterns
+
+PROBLEM 4: Metaspace OOM
+──────────────────────────
+java.lang.OutOfMemoryError: Metaspace
+
+Causes:
+  - ClassLoader leak (common in app servers after redeployments)
+  - Dynamic class generation (dynamic proxies, CGLIB, Groovy scripts)
+
+Solutions:
+  -XX:MaxMetaspaceSize=512m
+  Profile ClassLoader count: jcmd <pid> VM.metaspace
+  Fix: clear ThreadLocals on thread pool shutdown
+```
+
+### G1 GC Tuning Guidelines
+
+```bash
+# Start with these for most enterprise apps
+-XX:+UseG1GC                        # G1 (default Java 9+)
+-Xms8g -Xmx8g                       # Fixed heap = no resizing pauses
+-XX:MaxGCPauseMillis=200             # Target pause time (G1 tries to meet this)
+-XX:G1HeapRegionSize=16m            # Larger regions for large heaps (1–32MB)
+-XX:G1NewSizePercent=20             # Min young gen size
+-XX:G1MaxNewSizePercent=40          # Max young gen size
+-XX:InitiatingHeapOccupancyPercent=35  # Start concurrent marking at 35% heap used
+
+# If you see too many mixed GCs slowing throughput:
+-XX:G1MixedGCCountTarget=8          # Keep mixed phase short (default 8)
+-XX:G1HeapWastePercent=10           # Tolerate 10% reclaimable garbage before mixed GC
+
+# If you see humongous object issues (regions > G1HeapRegionSize/2):
+-XX:G1HeapRegionSize=32m            # Increase region size to fit large objects
+```
+
+### ZGC Tuning Guidelines (Java 17+)
+
+```bash
+# ZGC is largely self-tuning — minimal flags needed
+-XX:+UseZGC                         # Enable ZGC
+-Xms16g -Xmx16g                     # Fixed heap recommended
+-XX:ConcGCThreads=4                 # Concurrent GC threads (default: ~25% of cores)
+
+# Java 21+: Generational ZGC (better throughput)
+-XX:+UseZGC -XX:+ZGenerational
+
+# For extreme low-latency scenarios:
+-XX:SoftMaxHeapSize=14g             # Let ZGC use up to 16g but prefer 14g for headroom
+```
+
+---
+
+# Part 4: JVM Performance Optimization
+
+## 4.1 JIT Compilation (Deep Dive)
+
+### Tiered Compilation
+
+HotSpot uses 5-level tiered compilation, balancing fast startup vs peak performance:
+
+```
+Level 0: Interpreter
+  - Starts immediately
+  - Collects invocation counts and branch profiles
+  - Slow (re-interprets every time)
+
+Level 1: C1 - no profiling
+  - Quick native compilation
+  - Used for methods that won't benefit from C2
+
+Level 2: C1 - limited profiling
+  - Counts method invocations and back-edges
+
+Level 3: C1 - full profiling
+  - Collects detailed type profiles for virtual calls
+  - Feeds data to C2 for aggressive optimization
+
+Level 4: C2 - server compiler
+  - Aggressive, profile-guided optimizations
+  - Best steady-state performance
+  - Takes longer to compile
+```
+
+### Key JIT Optimizations
+
+**1. Method Inlining** — the most impactful optimization:
+```bash
+# Control inlining
+-XX:MaxInlineSize=35       # Max bytecodes to inline (default 35)
+-XX:FreqInlineSize=325     # Max bytecodes for frequently-called methods
+-XX:MaxInlineLevel=9       # Max inline depth
+
+# View inlining decisions
+-XX:+PrintCompilation      # See what gets compiled
+-XX:+UnlockDiagnosticVMOptions -XX:+PrintInlining
+```
+
+**2. Escape Analysis + Scalar Replacement**:
+```java
+// JIT can eliminate this allocation if it doesn't "escape" the method
+public String formatBalance(BigDecimal balance) {
+    // If JIT determines sb never escapes method, it might stack-allocate or eliminate entirely
+    StringBuilder sb = new StringBuilder();
+    sb.append("Balance: ").append(balance.toPlainString());
+    return sb.toString();
+}
+```
+
+**3. Lock Elision** — removes unnecessary synchronization:
+```java
+public String inefficientConcat(String a, String b) {
+    // StringBuffer is synchronized, but sb is local (doesn't escape)
+    // JIT elides the synchronization entirely
+    StringBuffer sb = new StringBuffer();
+    sb.append(a).append(b);
+    return sb.toString();
+}
+```
+
+### JIT Warm-Up
+
+```java
+// Performance benchmark must account for JIT warm-up
+public class BenchmarkExample {
+    public static void main(String[] args) throws InterruptedException {
+        // Warm-up phase: run many iterations to trigger JIT compilation
+        for (int i = 0; i < 100_000; i++) {
+            processPayment(createTestPayment());
+        }
+
+        System.out.println("JIT warmed up. Starting actual measurements...");
+        Thread.sleep(100);  // Let GC settle
+
+        // Actual benchmark
+        long start = System.nanoTime();
+        for (int i = 0; i < 10_000; i++) {
+            processPayment(createTestPayment());
+        }
+        long elapsed = System.nanoTime() - start;
+        System.out.println("Avg: " + (elapsed / 10_000) + "ns per payment");
+    }
+}
+```
+
+## 4.2 JVM Flags and Tuning
+
+### Essential JVM Flags Reference
+
+```bash
+# ─── Heap Sizing ───────────────────────────────────
+-Xms<size>              # Initial heap size (-Xms4g)
+-Xmx<size>              # Maximum heap size (-Xmx8g)
+-Xmn<size>              # Young generation size (-Xmn2g)
+# Best practice: Set Xms=Xmx for production (avoid resizing pauses)
+
+# ─── GC Selection ──────────────────────────────────
+-XX:+UseG1GC            # G1 GC (default Java 9+)
+-XX:+UseZGC             # ZGC (Java 15+ production)
+-XX:+UseShenandoahGC    # Shenandoah (OpenJDK, Java 12+)
+-XX:+UseParallelGC      # Parallel/Throughput GC (batch jobs)
+-XX:+UseSerialGC        # Serial GC (tiny heaps, single-core containers)
+
+# ─── Stack ─────────────────────────────────────────
+-Xss<size>              # Stack size per thread (-Xss512k)
+# Smaller stack = more threads possible (max threads ≈ free memory / stack size)
+
+# ─── Metaspace ─────────────────────────────────────
+-XX:MetaspaceSize=256m           # Initial metaspace commit size
+-XX:MaxMetaspaceSize=512m        # Upper limit (default: unlimited)
+
+# ─── GC Logging (Java 9+) ──────────────────────────
+-Xlog:gc*:file=gc.log:time,uptime:filecount=5,filesize=20m
+
+# ─── JIT ───────────────────────────────────────────
+-XX:+TieredCompilation          # Default on; staged compilation
+-XX:CompileThreshold=10000      # Invocations before compilation
+-XX:-TieredCompilation          # Disable tiered (interpret-only, for testing)
+
+# ─── Diagnostics ───────────────────────────────────
+-XX:+HeapDumpOnOutOfMemoryError         # Dump heap on OOM
+-XX:HeapDumpPath=/tmp/heapdump.hprof    # Where to save heap dump
+-XX:+ExitOnOutOfMemoryError             # Kill JVM on OOM (better than limping)
+-XX:+PrintGCDetails -XX:+PrintGCDateStamps  # Legacy GC logging (Java 8)
+
+# ─── Container/Docker ──────────────────────────────
+-XX:+UseContainerSupport        # Java 8u191+ reads cgroup limits (default on Java 10+)
+-XX:MaxRAMPercentage=75.0       # Use 75% of container memory for heap
+```
+
+### Kubernetes / Container Tuning
+
+```yaml
+# Kubernetes resource limits
+resources:
+  requests:
+    memory: "4Gi"
+    cpu: "2"
+  limits:
+    memory: "4Gi"
+    cpu: "4"
+```
+
+```bash
+# JVM configuration for container
+JAVA_OPTS="-XX:+UseContainerSupport \
+           -XX:MaxRAMPercentage=75.0 \
+           -XX:+UseZGC \
+           -XX:+ZGenerational \
+           -Xlog:gc*:file=/var/log/gc.log:time:filecount=3,filesize=10m \
+           -XX:+HeapDumpOnOutOfMemoryError \
+           -XX:HeapDumpPath=/tmp/ \
+           -XX:+ExitOnOutOfMemoryError"
+
+# With 4Gi container and MaxRAMPercentage=75%:
+# Heap = ~3GB, leaving 1GB for: Metaspace, thread stacks, off-heap, code cache
+```
+
+## 4.3 Profiling and Monitoring Tools
+
+### Java Flight Recorder (JFR) — Production-Safe Profiling
+
+JFR is built into the JVM (Java 11+ without commercial flag). Overhead < 1%. Best tool for production profiling.
+
+```bash
+# Start recording from command line
+jcmd <pid> JFR.start duration=120s filename=/tmp/recording.jfr settings=profile
+
+# Or configure at startup
+java -XX:StartFlightRecording=duration=60s,filename=/tmp/startup.jfr,settings=profile MyApp
+
+# Analyze with JDK Mission Control (jmc) or programmatically
+# Key metrics to check:
+# - Allocations: which methods allocate most?
+# - Lock contention: who is blocking?
+# - CPU usage by method
+# - GC details
+# - I/O and network
+```
+
+### Key Diagnostic Commands
+
+```bash
+# ─── Process list ───────────────────────────────────
+jps -lv                              # List Java processes with args
+
+# ─── Thread dump ────────────────────────────────────
+jstack <pid>                         # Thread state snapshot
+jcmd <pid> Thread.print              # More detailed
+
+# Thread analysis: look for BLOCKED or WAITING
+# "Thread-1" state=BLOCKED on <0x00007f6b38002500> (monitor of TransactionService)
+# → TransactionService is a bottleneck
+
+# ─── Heap inspection ────────────────────────────────
+jmap -histo <pid> | head -30         # Top 30 object types by size
+jmap -dump:format=b,file=heap.hprof <pid>   # Full heap dump
+
+# ─── GC stats ───────────────────────────────────────
+jstat -gcutil <pid> 1000 10          # GC utilization every 1s, 10 times
+
+# ─── Live JVM info ──────────────────────────────────
+jcmd <pid> VM.version                # JVM version
+jcmd <pid> VM.flags                  # Effective JVM flags (including defaults!)
+jcmd <pid> VM.system_properties      # System properties
+jcmd <pid> VM.metaspace              # Metaspace usage
+jcmd <pid> GC.heap_info              # Heap regions info
+jcmd <pid> GC.run                    # Trigger GC (diagnostic only!)
+```
+
+### Reading a Thread Dump
+
+```
+"http-nio-8080-exec-1" #25 daemon prio=5 os_prio=0 tid=0x00007f6b4c001800 nid=0x25c3
+    java.lang.Thread.State: WAITING (parking)
+    at sun.misc.Unsafe.park(Native Method)
+    at java.util.concurrent.locks.LockSupport.park(LockSupport.java:175)
+    at java.util.concurrent.locks.AbstractQueuedSynchronizer.parkAndCheckInterrupt(...)
+    at ... TransactionService.processPayment(TransactionService.java:45)
+
+# Key signals:
+# BLOCKED on <lock> → waiting for a synchronized block/method → contention
+# WAITING (parking)   → waiting on a lock/condition → typical for thread pools
+# TIMED_WAITING       → sleep or timed wait
+# RUNNABLE            → actively running (but might be stuck in native I/O)
+# "nid=0x25c3"        → native thread ID (use in top -p <pid> -H to correlate with CPU)
+```
+
+## 4.4 Performance Analysis
+
+### Identifying Memory Leaks
+
+```bash
+# 1. Monitor heap usage over time
+jstat -gc <pid> 5000 60    # Every 5s for 5 minutes
+
+# Healthy pattern: OU (old used) rises then drops after GC
+# Memory leak pattern: OU keeps rising, never drops below a higher minimum
+
+# 2. Heap histogram at intervals
+jmap -histo <pid> > histo1.txt; sleep 300; jmap -histo <pid> > histo2.txt
+diff histo1.txt histo2.txt | grep "^>" | sort -k2 -rn | head -20
+# Look for types whose counts/bytes keep growing
+
+# 3. Heap dump analysis in MAT
+# Dominator tree: shows objects holding most memory
+# Leak suspects: MAT flags likely leaks
+# Common culprits: HashMap, ArrayList, ThreadLocal, Cache implementations
+```
+
+### Common Performance Anti-Patterns
+
+```java
+// ❌ String concatenation in loop — creates O(n²) garbage
+StringBuilder sb = new StringBuilder();
+for (Transaction t : transactions) {
+    sb.append(t.getId() + "," + t.getAmount() + "\n");  // Creates 2 String objects per iteration
+}
+// ✅ Fix:
+for (Transaction t : transactions) {
+    sb.append(t.getId()).append(',').append(t.getAmount()).append('\n');
+}
+
+// ❌ Autoboxing in tight loop — Integer allocation
+Map<String, Integer> freq = new HashMap<>();
+for (String word : words) {
+    freq.put(word, freq.getOrDefault(word, 0) + 1);  // Integer boxing/unboxing each iteration
+}
+// ✅ Fix for high-performance code: MutableInt or int[] value
+Map<String, int[]> freq = new HashMap<>();
+for (String word : words) {
+    freq.computeIfAbsent(word, k -> new int[1])[0]++;  // No boxing
+}
+
+// ❌ Premature use of parallel streams
+list.parallelStream()
+    .filter(t -> t.getAmount().compareTo(BigDecimal.TEN) > 0)
+    .collect(toList());  // Thread coordination overhead may exceed benefit for small lists
+
+// ✅ Use parallel streams only when:
+// 1. Large data (>10,000 elements usually)
+// 2. CPU-bound operations (not I/O)
+// 3. Benchmark first!
+```
+
+---
+
+# Part 5: Advanced Topics
+
+## 5.1 String Pool and Interning
+
+```java
+// String literals go to the string pool (intern pool)
+String s1 = "hello";           // In pool
+String s2 = "hello";           // Same object from pool
+System.out.println(s1 == s2);  // true (same reference)
+
+// new String() bypasses the pool
+String s3 = new String("hello");   // New object in heap
+System.out.println(s1 == s3);     // false!
+System.out.println(s1.equals(s3)); // true (same content)
+
+// Manual interning
+String s4 = s3.intern();           // Puts in pool, returns pool reference
+System.out.println(s1 == s4);     // true!
+
+// Where is the pool?
+// Java 6 and earlier: PermGen → OutOfMemoryError: PermGen with too many interned strings
+// Java 7+: Main heap → GC'd, no longer a common OOM risk
+
+// When to use intern():
+// Large number of duplicate strings (customer codes, currency codes)
+// Reduces memory: 1 object instead of N identical objects
+// But: intern table is a global hash map — contention in multithreaded apps
+```
+
+## 5.2 Object Memory Layout
+
+```
+Object Header (16 bytes on 64-bit JVM with compressed oops):
+┌─────────────────────────────────────────────────────────┐
+│ Mark Word (8 bytes)                                     │
+│   - Hash code (25 bits)                                 │
+│   - GC age (4 bits) - how many GC cycles survived       │
+│   - Lock state (2 bits) - unlocked/biased/lightweight   │
+│   - Bias thread ID (if biased locking)                  │
+├─────────────────────────────────────────────────────────┤
+│ Class Pointer (4 bytes with -XX:+UseCompressedClassPointers)│
+│   - Points to class metadata in Metaspace               │
+└─────────────────────────────────────────────────────────┘
+Instance fields (padded to 8-byte alignment):
+┌────────────────────────────────────┐
+│ int field    (4 bytes)             │
+│ boolean field (1 byte + 3 padding) │
+│ long field   (8 bytes)             │
+│ reference    (4 bytes compressed)  │
+└────────────────────────────────────┘
+
+// Minimum object size: 16 bytes header (often total 16 bytes for empty objects)
+// Use jol-core library to inspect actual layout:
+// System.out.println(ClassLayout.parseClass(MyClass.class).toPrintable());
+```
+
+**Memory Layout Interview Points**:
+- Every Java object has a 12–16 byte header overhead (compressed oops = 12 bytes)
+- Fields are reordered by JVM for alignment (not in declaration order)
+- Compressed oops (`-XX:+UseCompressedOops`, default ≤ 32GB heap) saves 4 bytes per reference
+- `boolean` takes 1 byte in field (JVM pads for alignment), but 4 bytes in arrays!
+
+## 5.3 Modern JVM Features
+
+### Virtual Threads (Java 21) — JVM Internals
+
+```java
+// Virtual thread: Java-managed thread, not a 1:1 OS thread
+Thread.ofVirtual().start(() -> {
+    // Potentially millions of these can exist
+    // JVM parks virtual thread when it blocks on I/O
+    // Mounts it onto a carrier (platform) thread when it's ready to run
+    String data = httpClient.get("https://api.bank.com/rates");  // Non-blocking to carrier thread
+    process(data);
+});
+
+// Under the hood:
+// - Virtual thread → mounted on platform (carrier) thread
+// - When VT blocks (sleep, I/O wait), it unmounts: carrier thread is freed for another VT
+// - When VT is ready (I/O completes), scheduler re-mounts it on any available carrier
+// - Default carrier threads = number of CPU cores
+
+// Pinning — avoid these:
+// 1. synchronized blocks (in virtual threads): locks the carrier thread!
+//    Fix: use java.util.concurrent.locks.ReentrantLock instead
+// 2. Native methods: also pin the carrier thread
+```
+
+## 5.4 GraalVM and Native Images
+
+```bash
+# Native Image: compile Java to standalone native binary (no JVM needed)
+# Ahead-of-time (AOT) compilation
+
+# Create native image
+native-image -jar myapp.jar --no-fallback
+
+# Trade-offs:
+#                    JVM Mode      Native Image
+# Startup time       Seconds       Milliseconds
+# Peak performance   Very high     Good (no JIT)
+# Memory footprint   Higher        Very low
+# Reflection         Dynamic       Limited (must configure)
+# Dynamic class load Supported     Limited
+
+# Banking use cases:
+# ✅ CLI tools, batch jobs, Lambda functions → Native Image (fast startup)
+# ❌ Long-running payment servers → JVM preferred (JIT = better peak throughput)
+
+# Reflection in native images requires configuration:
+# native-image-agent: -agentlib:native-image-agent=config-output-dir=config/
+# This generates reflect-config.json listing all reflective accesses
+```
+
+---
+
+# Part 6: Interview Preparation
+
+## 6.1 Top 50 JVM Interview Questions
+
+### Section A: Architecture (Q1–10)
+
+**Q1: Explain the JVM architecture and its main components.**
+> Three subsystems: **Class Loader** (loads, links, initializes), **Runtime Data Areas** (heap, metaspace, stacks, PC registers), **Execution Engine** (interpreter, JIT compiler, GC). Interaction: class loader puts metadata in metaspace and creates objects in heap; JIT compiles hot code to native; GC manages heap lifecycle.
+
+**Q2: What is the difference between heap and stack?**
+> **Heap**: shared by all threads, stores objects, managed by GC, can grow/shrink.
+> **Stack**: per-thread, stores stack frames (local variables, operand stack, frame data), stores primitive values directly, references to heap objects. Stack is automatically managed (push/pop frames), not GC'd.
+
+**Q3: What causes StackOverflowError? OutOfMemoryError?**
+> **StackOverflowError**: stack depth exceeded — usually deep recursion. Stack size: `-Xss`.
+> **OutOfMemoryError** variants:
+> - `Java heap space`: heap full, GC can't free enough — increase heap, fix leak
+> - `Metaspace`: ClassLoader leak or too many dynamic classes — check `-XX:MaxMetaspaceSize`
+> - `GC overhead limit exceeded`: spending > 98% time in GC
+> - `unable to create new native thread`: too many threads, OS limit hit
+
+**Q4: Explain class loading with parent delegation.**
+> Request goes to Application ClassLoader → delegates to Platform → delegates to Bootstrap. Only if Bootstrap can't find it, Platform tries, then Application. Prevents core Java classes from being overridden by application code.
+
+**Q5: What's the difference between ClassNotFoundException and NoClassDefFoundError?**
+> **ClassNotFoundException**: checked exception, explicit `Class.forName()` or `loadClass()`, class not on classpath.
+> **NoClassDefFoundError**: unchecked error, class was present at compile time but missing at runtime, OR static initializer failed (ExceptionInInitializerError leads to this).
+
+**Q6: What is Metaspace? How does it differ from PermGen?**
+> PermGen (Java ≤7): fixed-size heap region for class metadata → frequent OOM.
+> Metaspace (Java 8+): native memory, auto-grows, no longer competes with heap. Still bounded by `-XX:MaxMetaspaceSize`. ClassLoader leaks can still exhaust it.
+
+**Q7: What is TLAB and why does it matter?**
+> Thread-Local Allocation Buffer: per-thread reserved region in Eden space. Object allocation = just bump a pointer (lock-free). Without TLAB, every allocation would require synchronizing on Eden's free pointer. TLAB makes highly concurrent allocation efficient.
+
+**Q8: What are the 5 invoke bytecode instructions?**
+> `invokestatic` (static methods), `invokespecial` (constructors, private, super), `invokevirtual` (instance method, virtual dispatch via vtable), `invokeinterface` (interface methods, itable lookup), `invokedynamic` (lambdas, method references, runtime-resolved).
+
+**Q9: What is JIT compilation? Why is it better than pure AOT?**
+> JIT compiles "hot" bytecode to native machine code at runtime. It's better than AOT for long-running services because it has actual runtime profile data: which branches are taken, what concrete types virtual calls actually dispatch to. JIT can make **speculative optimizations** that AOT cannot (it can deoptimize if assumptions are wrong).
+
+**Q10: What is escape analysis?**
+> JIT determines whether an object "escapes" its method — being stored in a field, passed to another thread, or returned. If it doesn't escape, JIT can: allocate on stack (faster, no GC), or eliminate entirely (scalar replacement), or elide locks (lock elision if object is local).
+
+### Section B: Garbage Collection (Q11–25)
+
+**Q11: How does generational GC work?**
+> Most objects die young (infant mortality). Young generation (Eden + Survivor spaces) is collected frequently with minor GCs. Objects that survive multiple GCs are promoted to Old generation, collected less often with major/full GCs. This matches object lifetime distribution and makes GC efficient.
+
+**Q12: What is G1 GC and when is it best?**
+> G1 divides heap into equal-sized regions (1-32MB each). It selects regions with most garbage for collection (Garbage First). Offers: concurrent marking, pause target (`-XX:MaxGCPauseMillis`), evacuation of young + mixed regions. Best for heaps 4GB+, needing predictable sub-second pauses.
+
+**Q13: Compare G1, ZGC, Shenandoah.**
+> G1: concurrent marking, STW evacuation. Sub-200ms typically.
+> ZGC: concurrent marking AND evacuation. Colored pointers. Sub-10ms. Java 15+ production.
+> Shenandoah: concurrent marking AND evacuation. Brooks forwarding pointers. Sub-10ms. OpenJDK only.
+> ZGC and Shenandoah sacrifice some throughput for minimal pauses. G1 is the safe default.
+
+**Q14: What is a full GC and why is it bad?**
+> Full GC collects entire heap (young + old + metaspace) with all threads stopped. Can take seconds. Causes: old gen full, metaspace full, explicit `System.gc()`, GC ergonomics as last resort. Goal in production: `FGC = 0` in jstat output.
+
+**Q15: What are GC roots?**
+> Starting points for GC reachability analysis: stack references (local variables across all threads), static variables, JNI handles, class objects in Metaspace. Any object reachable from a GC root is considered live.
+
+**Q16: Explain soft, weak, and phantom references.**
+> **Strong** (regular): never collected if reachable.
+> **SoftReference**: collected when JVM is low on memory — good for caches.
+> **WeakReference**: collected at any GC — used in `WeakHashMap` for key-value pairs where key can be GC'd.
+> **PhantomReference**: collected after finalization — used for cleanup after object death (replacing `finalize()`).
+
+**Q17: How do you diagnose a memory leak in Java?**
+> 1. Monitor Old gen growth over time with `jstat -gc <pid>`.
+> 2. Take heap histogram snapshots, compare — look for types growing unboundedly.
+> 3. Take heap dump (`jmap -dump`), analyze in Eclipse MAT.
+> 4. Check dominator tree for large retained heap.
+> 5. Common suspects: static `HashMap`/`List`, unbounded caches, ThreadLocal not cleared, event listeners not deregistered.
+
+**Q18: What is concurrent mode failure in CMS GC?**
+> CMS GC couldn't complete concurrent collection before old gen filled up. Falls back to a stop-the-world full GC. Triggered by high allocation rate or fragmentation. Solution: switch to G1 (CMS is deprecated/removed in Java 14+).
+
+**Q19: What is humongous object in G1?**
+> Object larger than 50% of G1 region size. Allocated directly in old generation humongous regions (bypassing young gen). Not collected in young GC. Increase region size (`-XX:G1HeapRegionSize`) to reduce humongous allocations. Large byte arrays, Strings are common humongous objects.
+
+**Q20: How do you trigger and read a thread dump?**
+> `jstack <pid>` or `jcmd <pid> Thread.print` or `kill -3 <pid>` (sends SIGQUIT, JVM prints to stdout).
+> Key states: `BLOCKED` (contention on monitor lock), `WAITING` (explicitly waiting), `TIMED_WAITING` (sleep or wait with timeout), `RUNNABLE` (running or stuck in native I/O).
+
+**Q21–25**: (Additional common questions)
+> **Q21: What is ZGC's colored pointer technique?** → ZGC embeds GC metadata (mark bits, remapping state) in unused bits of 64-bit object references. No extra header words. Load barriers check and update these bits when a reference is accessed.
+>
+> **Q22: What is remembered set (RSet) in G1?** → Per-region data structure tracking which other regions hold references into this region. Needed for young GC — JVM must know if old-gen objects point to young-gen objects without scanning the entire old gen.
+>
+> **Q23: How does G1 pick regions to collect?** → Concurrent Marking tracks live bytes per region. Collection Set (CSet) selects regions with lowest live bytes (most reclaimable garbage) that fit within the pause target.
+>
+> **Q24: What is safepoint in JVM?** → A point in execution where thread state is known and consistent, allowing JVM operations (GC, deoptimization). JVM requests global safepoint (stop-the-world); all threads must reach a safepoint. Long-running native code or tight loops can delay safepoints.
+>
+> **Q25: What is biased locking? (Java 15 deprecated, Java 21 removed)** → Optimization for uncontended synchronized blocks — lock biased to first acquiring thread, no CAS needed for subsequent acquires by same thread. Deprecated because its revocation cost outweighs benefit in modern concurrent code.
+
+### Section C: Performance (Q26–35)
+
+**Q26: How does JIT tiered compilation work?**
+> 5 levels: 0 = interpreter, 1-3 = C1 compiler with increasing profiling, 4 = C2 compiler (aggressive). Methods start at 0, warm up through C1 levels, hottest methods reach C2 for maximum optimization.
+
+**Q27: What is deoptimization?**
+> JIT may make speculative optimizations (e.g., inline a virtual call assuming only one concrete type). If that assumption is violated (new subclass loaded), JVM deoptimizes — reverts to interpreted mode for that method. Performance temporarily drops then recovers as method re-warms.
+
+**Q28: How do you fix OutOfMemoryError in production immediately?**
+> 1. `jcmd <pid> GC.run` — force GC (temporary relief).
+> 2. Kill and restart (if heap dump is needed: already configured `-XX:+HeapDumpOnOutOfMemoryError`).
+> 3. Analyze heap dump for root cause.
+> Increasing heap is not a fix — it delays OOM if there's a leak.
+
+**Q29: What JVM options do you set for a Spring Boot microservice in Kubernetes?**
+> `-XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0 -XX:+UseZGC -XX:+ZGenerational -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/tmp/ -XX:+ExitOnOutOfMemoryError -Xlog:gc*:file=/var/log/gc.log:time:filecount=3,filesize=10m`
+
+**Q30: When would you use `System.gc()`?**
+> Almost never. It's only a suggestion to the JVM, not a guarantee. In production: never. In testing/benchmarking: sometimes useful after setup to start with clean heap. Better alternatives: properly size heap, let GC algorithm decide when to collect.
+
+### Section D: Advanced (Q36–50)
+
+**Q36: How does virtual thread scheduling work at the JVM level?**
+> JVM maintains a ForkJoinPool of carrier threads (platform threads, count = CPU cores). Virtual threads are scheduled by the JVM scheduler (not OS). When a VT blocks (I/O, sleep), it's unmounted from its carrier; the carrier picks up another runnable VT. This M:N multiplexing allows millions of VTs on a few platform threads.
+
+**Q37: What is structured concurrency (Java 21 preview)?**
+> `StructuredTaskScope`: subtasks' lifetimes are bound to the scope's lifetime. If one subtask fails or scope is cancelled, all subtasks are automatically cancelled. Much easier reasoning about concurrency than raw CompletableFuture chains.
+
+**Q38: Explain the Java Memory Model happens-before relationship.**
+> Operations A and B have happens-before if: program order within a thread, `synchronized` block unlock HB subsequent lock, `volatile` write HB subsequent read, `Thread.start()` HB thread's first action, `Thread.join()` returns HB caller sees joined thread's actions.
+
+**Q39: What is the performance difference between `synchronized` and `ReentrantLock`?**
+> Similar performance for uncontended access (~1ns). Under contention: `ReentrantLock` offers more control (tryLock with timeout, lockInterruptibly, fairness policy). Biased locking (`synchronized`) removed in Java 21. ReentrantLock can have slightly better throughput under high contention. Use `synchronized` for simple cases (readable), `ReentrantLock` for advanced scenarios (try with timeout, multiple conditions).
+
+**Q40: How does the JVM implement exception handling?**
+> Each method has an exception table in its bytecode. When an exception is thrown, JVM scans the table for a catch block covering the current instruction. No catch found → unwind stack frame, repeat for caller. Performance: throwing an exception includes `fillInStackTrace()` which walks the entire call stack — expensive for frequent exceptions. Anti-pattern: using exceptions for control flow.
+
+## 6.2 System Design Questions Involving JVM Tuning
+
+**Scenario 1**: "Design a payment processing service for 10,000 TPS with <50ms p99 latency."
+
+> - GC: ZGC with Generational mode (`-XX:+UseZGC -XX:+ZGenerational`). Sub-millisecond pauses.
+> - Heap: `-Xms16g -Xmx16g` (fixed, no resizing). Size based on object lifetime analysis.
+> - Threads: Virtual threads (`Thread.ofVirtual()`) for I/O-bound processing — can have thousands concurrent without thread explosion.
+> - Avoid: `synchronized` on hot paths (use `ReentrantLock`), frequent allocations in payment logic (object pooling where appropriate).
+> - Monitor: JFR recording in production with 1% overhead.
+
+**Scenario 2**: "Our batch job OOMs every night processing 5M records."
+
+> Check:
+> 1. Is the entire dataset loaded into memory? — Stream processing, don't load all at once.
+> 2. Are intermediate collections unbounded? — Use `Stream` operations rather than intermediate List accumulation.
+> 3. Memory leak in batch framework? — Check static caches, thread locals.
+> 4. Trial: increase heap with monitoring, but find root cause.
+> 5. Enable: `-XX:+HeapDumpOnOutOfMemoryError` to capture dump at next occurrence.
+
+## 6.3 Troubleshooting Scenarios
+
+**Scenario 1**: Application latency spikes every 10 minutes, lasting 2-3 seconds.
+
+```
+Investigation steps:
+1. Enable GC logging → look for "Pause Full" at 10m intervals
+2. jstat -gc <pid> → FGC count will be increasing
+3. Root cause likely: Old gen filling up → Full GC every 10m
+4. Fix: Increase -Xmx, check for object retention, tune G1 parameters
+```
+
+**Scenario 2**: Application leaking memory — heap never drops.
+
+```
+1. jstat -gc <pid> 60000 → watch OU (old used) trend
+2. Health check: after load spike, OU should recover → if it doesn't: leak
+3. jmap -histo:live <pid> | head -30 → identify growing types
+4. Heap dump + MAT → dominator tree → find root references holding large graphs
+5. Common fix: unbounded static Map/List, missing cache eviction, unreferenced ThreadLocal
+```
+
+## 6.4 How to Discuss JVM Topics in Interviews
+
+### The STAR approach for JVM questions:
+
+**"Tell me about a JVM performance problem you solved."**
+
+> "In our payment gateway at [Company], we were seeing 3-second latency spikes every 15-20 minutes during peak hours. My investigation [Situation/Task]:
+>
+> **Action**: Enabled GC logging (`-Xlog:gc*`), analyzed with GC Viewer. Found Full GC every 18 minutes, taking 2.8 seconds — all application threads stopped. jstat confirmed old generation was reaching 95% capacity before triggering.
+>
+> The root cause was an unbounded in-memory cache for exchange rate lookups that had no eviction policy. Over 18 minutes it accumulated enough BigDecimal objects to fill old gen.
+>
+> **Fix**: 1) Replaced HashMap with Caffeine cache (`maximumSize(1000).expireAfterWrite(5m)`). 2) Increased heap from 4g to 8g for headroom. 3) Switched from G1 to ZGC for lower maximum pause times.
+>
+> **Result**: Full GCs eliminated entirely. p99 latency dropped from 3.1s to 45ms. Zero customer complaints about timeouts since."
+
+---
+
+# Appendices
+
+## Appendix A: JVM Flags Reference (Quick Reference Card)
+
+```bash
+# HEAP
+-Xms<n>[g|m]                    # Initial heap
+-Xmx<n>[g|m]                    # Max heap (set = Xms to avoid resizing)
+-Xmn<n>[g|m]                    # Young gen size
+-XX:NewRatio=<n>                 # Old/Young ratio
+-XX:SurvivorRatio=<n>            # Eden/Survivor ratio
+
+# GARBAGE COLLECTORS
+-XX:+UseG1GC                     # G1 (default Java 9+)
+-XX:+UseZGC                      # ZGC
+-XX:+UseShenandoahGC             # Shenandoah (OpenJDK)
+-XX:+UseParallelGC               # Parallel/Throughput
+-XX:+UseSerialGC                 # Serial
+
+# G1 TUNING
+-XX:MaxGCPauseMillis=200         # Pause target
+-XX:G1HeapRegionSize=<n>m        # Region size 1-32MB
+-XX:InitiatingHeapOccupancyPercent=35  # Concurrent marking trigger
+
+# METASPACE
+-XX:MetaspaceSize=<n>m           # Initial
+-XX:MaxMetaspaceSize=<n>m        # Max (default: unlimited)
+
+# STACK
+-Xss<n>[k|m]                    # Thread stack size
+
+# DIAGNOSTICS
+-XX:+HeapDumpOnOutOfMemoryError  # Auto heap dump on OOM
+-XX:HeapDumpPath=<path>          # Heap dump location
+-XX:+ExitOnOutOfMemoryError      # Kill JVM on OOM
+-Xlog:gc*:file=<path>:time:...  # GC logging (Java 9+)
+
+# CONTAINER
+-XX:+UseContainerSupport         # Respect cgroup limits
+-XX:MaxRAMPercentage=75.0        # % of container RAM for heap
+
+# JIT
+-XX:CompileThreshold=10000       # Invocations before JIT
+-XX:+PrintCompilation            # Log compiled methods
+```
+
+## Appendix B: GC Comparison Matrix
+
+| Feature | Serial | Parallel | CMS | G1 | ZGC | Shenandoah |
+|---------|--------|----------|-----|-----|-----|------------|
+| **Young GC** | STW single-thread | STW multi-thread | STW multi-thread | STW (parallel) | Concurrent | Concurrent |
+| **Old GC** | STW single-thread | STW multi-thread | Mostly concurrent | Mixed (concurrent+STW) | Mostly concurrent | Mostly concurrent |
+| **Evacuation** | STW | STW | N/A | STW | Concurrent | Concurrent |
+| **Typical max pause** | Seconds | Seconds | Hundreds of ms | Tens-hundreds ms | <10ms | <10ms |
+| **Throughput** | Low | Highest | Medium | High | Medium-High | Medium |
+| **Footprint overhead** | Lowest | Low | Medium | Medium | Higher (colored ptrs) | Higher (fwd ptrs) |
+| **Best for** | Tiny heaps | Batch/throughput | Legacy (deprecated) | General purpose | Low-latency APIs | Low-latency (OpenJDK) |
+| **Available since** | Java 1.3 | Java 1.3 | Java 1.4 (removed 14) | Java 7 | Java 11 | Java 12 |
+| **Default** | No | Java 8 (server) | No | **Java 9+** | No | No |
+
+## Appendix C: Troubleshooting Checklist
+
+```
+HIGH LATENCY SPIKES
+□ Check GC logs for "Pause Full" → OOMish GC
+□ jstat -gcutil <pid> → look for high O (old gen %)
+□ Look for blocked threads: jstack <pid> | grep BLOCKED
+□ Check thread pool saturation: too many WAITING threads
+□ Network: DNS resolution timeout, connection pool exhaustion
+
+HIGH CPU
+□ jstack <pid> and correlate with top -H for RUNNABLE threads
+□ JFR recording for CPU-intensive methods
+□ Hot lock contention: many threads BLOCKED on same monitor
+
+MEMORY LEAK
+□ jstat -gc <pid> → OU growing over time and not recovering
+□ jmap -histo:live <pid> → growing object counts
+□ Heap dump → MAT dominator tree → top 10 retained heap paths
+□ Check: static collections, unbounded caches, ThreadLocal, event listeners
+
+THREAD ISSUES
+□ Thread count: jcmd <pid> Thread.print | grep "^\"" | wc -l
+□ Thread leaks: count threads at startup, after load, after load drops
+□ Deadlock: jstack shows "Found one Java-level deadlock"
+
+OOM DIAGNOSIS
+□ Enable before issue: -XX:+HeapDumpOnOutOfMemoryError
+□ Parse OOM message: "Java heap space" vs "Metaspace" vs "GC overhead"
+□ After restart: analyze heap dump with Eclipse MAT
+```
+
+## Appendix D: Recommended Reading
+
+- **"Java Performance" by Scott Oaks** — The definitive guide to JVM performance tuning
+- **"Optimizing Java" by Benjamin Evans** — Practical performance analysis
+- **JEPs to read**:
+  - JEP 333: ZGC (Java 11)
+  - JEP 376: ZGC: Concurrent Thread-Stack Processing (Java 16)
+  - JEP 439: Generational ZGC (Java 21)
+  - JEP 444: Virtual Threads (Java 21)
+- **Oracle JVM Tuning Guide**: https://docs.oracle.com/en/java/javase/21/gc/
+- **GCEasy.io**: Paste GC logs for automatic analysis
+- **Eclipse Memory Analyzer (MAT)**: Heap dump analysis tool

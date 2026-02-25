@@ -246,7 +246,7 @@ gantt
 
 ### 01. Fundamentals and OOP Principles
 
-**Status**: 📝 To be created
+**Status**: ✅ Complete - [01-fundamentals-and-oop.md](./01-fundamentals-and-oop.md)
 
 **Coverage**:
 - Object-Oriented Programming core concepts
@@ -276,7 +276,7 @@ gantt
 
 ### 02. Collections Framework
 
-**Status**: 📝 To be created
+**Status**: ✅ Complete - [02-collections-framework.md](./02-collections-framework.md)
 
 **Coverage**:
 - Collection hierarchy and interfaces
@@ -376,7 +376,7 @@ graph LR
 
 ### 04. Streams and Functional Programming
 
-**Status**: 📝 To be created
+**Status**: ✅ Complete - [04-streams-and-functional-programming.md](./04-streams-and-functional-programming.md)
 
 **Coverage**:
 - Lambda expressions and syntax
@@ -532,7 +532,7 @@ stateDiagram-v2
 
 ### 07. Java 8 LTS Features
 
-**Status**: 📝 To be created
+**Status**: ✅ Complete - [07-java-8-features.md](./07-java-8-features.md)
 **Release**: September 2014
 **Support**: Extended until 2030
 
@@ -553,7 +553,7 @@ stateDiagram-v2
 
 ### 08. Java 9-10 Features
 
-**Status**: 📝 To be created
+**Status**: ✅ Complete - [08-java-9-10-features.md](./08-java-9-10-features.md)
 
 **Java 9** (September 2017):
 - Module system (JPMS)
@@ -593,7 +593,7 @@ stateDiagram-v2
 
 ### 10. Java 12-16 Features
 
-**Status**: 📝 To be created
+**Status**: ✅ Complete - [10-java-12-16-features.md](./10-java-12-16-features.md)
 
 **Java 12** (March 2019):
 - Switch expressions (preview)
@@ -624,7 +624,7 @@ stateDiagram-v2
 
 ### 11. Java 17 LTS Features
 
-**Status**: 📝 To be created
+**Status**: ✅ Complete - [11-java-17-lts-features.md](./11-java-17-lts-features.md)
 **Release**: September 2021
 **Support**: Extended until 2029
 
@@ -640,7 +640,7 @@ stateDiagram-v2
 
 ### 12. Java 18-20 Features
 
-**Status**: 📝 To be created
+**Status**: ✅ Complete - [12-java-18-20-features.md](./12-java-18-20-features.md)
 
 **Java 18** (March 2022):
 - UTF-8 by default
@@ -701,7 +701,7 @@ graph TD
 
 ### 14. Java 22-25 Features
 
-**Status**: 📝 To be created
+**Status**: ✅ Complete - [14-java-22-25-features.md](./14-java-22-25-features.md)
 
 **Java 22** (March 2024):
 - Foreign Function & Memory API (standardized)
@@ -728,7 +728,7 @@ graph TD
 
 ### 15. String Manipulation
 
-**Status**: 📝 To be created
+**Status**: ✅ Complete - [15-string-manipulation.md](./15-string-manipulation.md)
 
 **Coverage**:
 - String immutability and string pool
@@ -741,7 +741,7 @@ graph TD
 
 ### 16. Enums and Annotations
 
-**Status**: 📝 To be created
+**Status**: ✅ Complete - [16-enums-and-annotations.md](./16-enums-and-annotations.md)
 
 **Coverage**:
 - Enum basics and advanced usage
@@ -754,7 +754,7 @@ graph TD
 
 ### 17. I/O and NIO
 
-**Status**: 📝 To be created
+**Status**: ✅ Complete - [17-io-and-nio.md](./17-io-and-nio.md)
 
 **Coverage**:
 - java.io (Streams, Readers, Writers)
@@ -766,7 +766,7 @@ graph TD
 
 ### 18. Date and Time API
 
-**Status**: 📝 To be created
+**Status**: ✅ Complete - [18-date-time-api.md](./18-date-time-api.md)
 
 **Coverage**:
 - java.time package (Java 8+)
@@ -782,7 +782,7 @@ graph TD
 
 ### 19. Version Migration Guide
 
-**Status**: 📝 To be created
+**Status**: ✅ Complete - [19-version-migration-guide.md](./19-version-migration-guide.md)
 
 **Coverage**:
 - Migration strategies (Java 8 → 11 → 17 → 21)
@@ -793,7 +793,64 @@ graph TD
 
 ---
 
-## Part 10: Interview Preparation
+## Part 10: Advanced Engineering Patterns
+
+> These files address critical Staff/Principal interview gaps identified during prep.
+
+### 21. Design Patterns
+
+**Status**: ✅ Complete - [21-design-patterns.md](./21-design-patterns.md)
+
+**Coverage**:
+- Creational: Singleton (enum, DCL), Factory Method, Abstract Factory, Builder, Prototype
+- Structural: Adapter, Decorator, Proxy (JDK + CGLIB), Facade, Composite
+- Behavioral: Strategy, Observer, Template Method, Command, Chain of Responsibility, State
+- Spring/Java framework pattern mapping
+- Pattern selection guide (mermaid flowchart)
+- Top 5 interview Q&A
+
+---
+
+### 22. SOLID Principles & Clean Code
+
+**Status**: ✅ Complete - [22-solid-principles.md](./22-solid-principles.md)
+
+**Coverage**:
+- SRP, OCP, LSP, ISP, DIP — each with ❌ violation and ✅ fixed examples
+- DRY, KISS, YAGNI
+- Full refactoring example applying all 5 principles
+- Interview Q&A (including how Spring enforces DIP, @Transactional and OCP)
+
+---
+
+### 23. Reflection & Dynamic Proxies
+
+**Status**: ✅ Complete - [23-reflection-and-proxies.md](./23-reflection-and-proxies.md)
+
+**Coverage**:
+- Reflection API: class/field/method inspection, private access, performance caching
+- JDK Dynamic Proxies: InvocationHandler, how @Transactional works internally
+- CGLIB proxies: class-based, why final methods aren't proxied
+- AOP: @Around, proceed(), cross-cutting concerns
+- Self-invocation bypass problem and fix
+
+---
+
+### 24. Serialization Deep Dive
+
+**Status**: ✅ Complete - [24-serialization.md](./24-serialization.md)
+
+**Coverage**:
+- Java Serializable: what gets serialized, serialVersionUID contract
+- transient keyword use cases
+- Custom writeObject/readObject, readResolve for singletons
+- Externalizable for full control
+- Jackson JSON: @JsonProperty, @JsonIgnore, @JsonCreator, @JsonTypeInfo, polymorphism
+- Security risks and safe deserialization patterns
+
+---
+
+## Part 11: Interview Preparation
 
 ## Top 100 Core Java Interview Questions
 

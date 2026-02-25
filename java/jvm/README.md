@@ -27,7 +27,7 @@ A comprehensive, enterprise-focused JVM internals guide for senior Java engineer
 - ✅ 2.4 Thread-Local Memory (Stack, PC Register, TLABs)
 - ✅ 2.5 Java Memory Model (JMM)
 
-### Part 3: Garbage Collection (IN PROGRESS)
+### Part 3: Garbage Collection
 - ✅ 3.1 GC Fundamentals (GC roots, reachability, reference types)
 - ✅ 3.2 GC Algorithms (mark-sweep, mark-compact, copying)
 - ✅ 3.3 Serial GC (complete with tuning, scenarios)
@@ -35,33 +35,33 @@ A comprehensive, enterprise-focused JVM internals guide for senior Java engineer
 - ✅ 3.5 CMS GC (concurrent mark-sweep, deprecated but interview-relevant)
 - ✅ 3.6 G1 GC (DEFAULT GC - extensive coverage with regions, RSets, mixed collections)
 - ✅ 3.7 ZGC (ultra-low latency, colored pointers, load barriers, comprehensive)
-- ⏳ 3.8 Shenandoah GC (pending)
-- ⏳ 3.9 Epsilon GC (pending)
-- ⏳ 3.10 GC Tuning and Troubleshooting (pending)
+- ✅ 3.8 Shenandoah GC (Brooks forwarding pointers, concurrent evacuation, OpenJDK)
+- ✅ 3.9 Epsilon GC (no-op GC, use cases for benchmarking and short-lived JVMs)
+- ✅ 3.10 GC Tuning and Troubleshooting (G1/ZGC tuning flags, jstat/jmap/jcmd commands, common problems)
 
 ### Part 4: JVM Performance Optimization
-- ⏳ 4.1 JIT Compilation (pending)
-- ⏳ 4.2 JVM Flags and Tuning (pending)
-- ⏳ 4.3 Profiling and Monitoring Tools (pending)
-- ⏳ 4.4 Performance Analysis (pending)
+- ✅ 4.1 JIT Compilation (tiered compilation levels, optimizations, warm-up)
+- ✅ 4.2 JVM Flags and Tuning (heap, GC, stack, metaspace, container, diagnostics)
+- ✅ 4.3 Profiling and Monitoring Tools (JFR, jstack, jmap, jstat, jcmd reference)
+- ✅ 4.4 Performance Analysis (memory leak detection, common anti-patterns)
 
 ### Part 5: Advanced Topics
-- ⏳ 5.1 String Pool and Interning (pending)
-- ⏳ 5.2 Object Memory Layout (pending)
-- ⏳ 5.3 Modern JVM Features (pending)
-- ⏳ 5.4 GraalVM and Native Images (pending)
+- ✅ 5.1 String Pool and Interning (pool location by Java version, intern(), thread safety)
+- ✅ 5.2 Object Memory Layout (header, fields, compressed oops, alignment)
+- ✅ 5.3 Modern JVM Features (Virtual Threads internals, pinning, structured concurrency)
+- ✅ 5.4 GraalVM and Native Images (AOT, trade-offs, reflection configuration)
 
 ### Part 6: Interview Preparation
-- ⏳ 6.1 Top 50 JVM Interview Questions (pending)
-- ⏳ 6.2 System Design Questions Involving JVM Tuning (pending)
-- ⏳ 6.3 Troubleshooting Scenarios (pending)
-- ⏳ 6.4 How to Discuss JVM Topics in Interviews (pending)
+- ✅ 6.1 Top 50 JVM Interview Questions (comprehensive Q&A with model answers)
+- ✅ 6.2 System Design Questions Involving JVM Tuning (payment service, batch OOM)
+- ✅ 6.3 Troubleshooting Scenarios (latency spikes, memory leaks — step-by-step)
+- ✅ 6.4 How to Discuss JVM Topics in Interviews (STAR approach example)
 
 ### Appendices
-- ⏳ Appendix A: JVM Flags Reference (pending)
-- ⏳ Appendix B: GC Comparison Matrix (pending)
-- ⏳ Appendix C: Troubleshooting Checklist (pending)
-- ⏳ Appendix D: Recommended Reading and Resources (pending)
+- ✅ Appendix A: JVM Flags Reference (comprehensive quick-reference card)
+- ✅ Appendix B: GC Comparison Matrix (Serial/Parallel/CMS/G1/ZGC/Shenandoah)
+- ✅ Appendix C: Troubleshooting Checklist (high latency, CPU, memory leak, threads, OOM)
+- ✅ Appendix D: Recommended Reading and Resources
 
 ## What's Included in Each Section
 
