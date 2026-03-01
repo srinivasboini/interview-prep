@@ -115,47 +115,153 @@ class Solution {
 
 ---
 
-## 4. DP Array Visualization
+## 4. Complete Visual Mapping: DP Array Trace
 
 To truly understand tabulation, let's visualize the actual DP Array (size `n + 1`) being filled step-by-step for `n = 5`.
 
-**1. Initialization & Base Cases:**
-We know that climbing to step 1 has 1 way, and climbing to step 2 has 2 ways. These are our base cases.
+### ITERATION 1: Initialization & Base Cases
+
+**Recursive thinking:**
 ```text
-Index (i) : [ 0, 1, 2, 3, 4, 5 ]
-dp array  : [ 0, 1, 2, 0, 0, 0 ]
-                 ^  ^
-            Base Cases mapped from Recursion
+climbStairs(1) = 1
+climbStairs(2) = 2
 ```
 
-**2. Solving Subproblems (Iterative filling):**
-
-**Step i = 3:** `dp[3] = dp[2] + dp[1] = 2 + 1 = 3`
+**Array filling:**
 ```text
-Index (i) : [ 0,  1,  2, [3],  4,  5 ]
-dp array  : [ 0, (1),(2), 3 ,  0,  0 ]
+Index (i) →  0    1    2    3    4    5
+dp array  → [0]  [1]  [2]  [0]  [0]  [0]
+                  ↑    ↑
+             Base Cases Mapped
 ```
-
-**Step i = 4:** `dp[4] = dp[3] + dp[2] = 3 + 2 = 5`
-```text
-Index (i) : [ 0,  1,  2,  3, [4],  5 ]
-dp array  : [ 0,  1, (2),(3), 5 ,  0 ]
-```
-
-**Step i = 5:** `dp[5] = dp[4] + dp[3] = 5 + 3 = 8`
-```text
-Index (i) : [ 0,  1,  2,  3,  4, [5] ]
-dp array  : [ 0,  1,  2, (3),(5), 8  ]
-                 Final Answer ^^^
-```
-
-**Final Answer:** `dp[5] = 8`. There are 8 total ways to reach step 5.
-
-*(Note: In the space-optimized $O(1)$ solution provided earlier, we simply use two variables to track the two previous array cells `(prev1, prev2)` instead of allocating the entire array, but the logical filling process remains identical!)*
 
 ---
 
-## 5. Complexity Analysis
+### ITERATION 2: Fill for Step 3 (i=3)
+
+#### Cell dp[3]: "How many ways to reach step 3?"
+
+**Recursive thinking:**
+```text
+climbStairs(3):
+  return climbStairs(2) + climbStairs(1)
+```
+
+**Breaking it down:**
+```text
+climbStairs(2) = ? -> Look at dp[2] = 2
+climbStairs(1) = ? -> Look at dp[1] = 1
+
+Result = 2 + 1 = 3
+```
+
+**Array filling:**
+```text
+Index (i) →  0    1    2    3    4    5
+dp array  → [0]  [1]  [2]  [?]
+                  ↑    ↑    ↑
+                  |    |    Filling this
+                  └────┴────┘
+             Dependencies ready!
+
+Code:
+dp[3] = dp[2] + dp[1] 
+      =  2    +  1    = 3
+```
+
+---
+
+### ITERATION 3: Fill for Step 4 (i=4)
+
+#### Cell dp[4]: "How many ways to reach step 4?"
+
+**Array filling:**
+```text
+Index (i) →  0    1    2    3    4    5
+dp array  → [0]  [1]  [2]  [3]  [?]
+                       ↑    ↑    ↑
+                       |    |    Filling this
+                       └────┴────┘
+                  Dependencies ready!
+
+Code:
+dp[4] = dp[3] + dp[2] 
+      =  3    +  2    = 5
+```
+
+---
+
+### ITERATION 4: Fill for Step 5 (i=5)
+
+#### Cell dp[5]: "How many ways to reach step 5?"
+
+**Array filling:**
+```text
+Index (i) →  0    1    2    3    4    5
+dp array  → [0]  [1]  [2]  [3]  [5]  [?]
+                            ↑    ↑    ↑
+                            |    |    Filling this
+                            └────┴────┘
+
+Code:
+dp[5] = dp[4] + dp[3] 
+      =  5    +  3    = 8
+```
+
+**Final Result:**
+```text
+Index (i) →  0    1    2    3    4    5
+dp array  → [0]  [1]  [2]  [3]  [5]  [8] ← ANSWER at dp[5]
+```
+
+---
+
+## 5. The Complete Mapping Pattern
+
+### Every Recursive Call Maps to an Array Cell
+```text
+Recursion:                    Tabulation:
+climbStairs(i)        ←→      dp[i]
+
+climbStairs(i-1)      ←→      dp[i-1]      (1 cell to the left)
+
+climbStairs(i-2)      ←→      dp[i-2]      (2 cells to the left)
+```
+
+### Visual Dependency Pattern
+```text
+When filling ANY cell dp[i]:
+
+Index (i) →   ...   i-2    i-1     i
+dp array  →   ...  [val]  [val]   [?]
+                     ↑      ↑      ↑
+                     |      |    Current Cell = Sum of both
+                     └──────┴──────┘
+```
+
+---
+
+## 6. Side-by-Side: Final Comparison
+
+### Recursion (Top-Down)
+```java
+climbStairs(5) {
+  return climbStairs(4) + climbStairs(3); // Recursive calls
+}
+```
+
+### Tabulation (Bottom-Up)
+```java
+dp[5] = dp[4] + dp[3]; // Array lookups
+```
+
+**Same logic, but:**
+- Recursion: Makes function calls (expensive, $O(2^n)$ time without memoization)
+- Tabulation: Reads from array (fast, $O(n)$ time)
+
+---
+
+## 7. Complexity Analysis
 
 ### Naive Recursive Solution
 - **Time Complexity:** $O(2^n)$. Each node branches into two recursive calls, creating a tree of depth $n$.
