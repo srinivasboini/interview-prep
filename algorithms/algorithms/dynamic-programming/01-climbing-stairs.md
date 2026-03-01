@@ -117,16 +117,41 @@ class Solution {
 
 ## 4. DP Array Visualization
 
-Let's visualize how the variables update iteratively for `n = 5`.
+To truly understand tabulation, let's visualize the actual DP Array (size `n + 1`) being filled step-by-step for `n = 5`.
 
-| Step (`i`) | Computation (`current = prev1 + prev2`) | Result for Step `i` | `prev1` (updated) | `prev2` (updated) |
-| :--- | :--- | :--- | :--- | :--- |
-| **Start** | `N/A` (Base cases initialized) | `N/A` | `2` (step 2) | `1` (step 1) |
-| **3** | `2 + 1` | `3` | `3` (step 3) | `2` (step 2) |
-| **4** | `3 + 2` | `5` | `5` (step 4) | `3` (step 3) |
-| **5** | `5 + 3` | `8` | `8` (step 5) | `5` (step 4) |
+**1. Initialization & Base Cases:**
+We know that climbing to step 1 has 1 way, and climbing to step 2 has 2 ways. These are our base cases.
+```text
+Index (i) : [ 0, 1, 2, 3, 4, 5 ]
+dp array  : [ 0, 1, 2, 0, 0, 0 ]
+                 ^  ^
+            Base Cases mapped from Recursion
+```
 
-**Final Answer:** 8 total ways to reach step 5.
+**2. Solving Subproblems (Iterative filling):**
+
+**Step i = 3:** `dp[3] = dp[2] + dp[1] = 2 + 1 = 3`
+```text
+Index (i) : [ 0,  1,  2, [3],  4,  5 ]
+dp array  : [ 0, (1),(2), 3 ,  0,  0 ]
+```
+
+**Step i = 4:** `dp[4] = dp[3] + dp[2] = 3 + 2 = 5`
+```text
+Index (i) : [ 0,  1,  2,  3, [4],  5 ]
+dp array  : [ 0,  1, (2),(3), 5 ,  0 ]
+```
+
+**Step i = 5:** `dp[5] = dp[4] + dp[3] = 5 + 3 = 8`
+```text
+Index (i) : [ 0,  1,  2,  3,  4, [5] ]
+dp array  : [ 0,  1,  2, (3),(5), 8  ]
+                 Final Answer ^^^
+```
+
+**Final Answer:** `dp[5] = 8`. There are 8 total ways to reach step 5.
+
+*(Note: In the space-optimized $O(1)$ solution provided earlier, we simply use two variables to track the two previous array cells `(prev1, prev2)` instead of allocating the entire array, but the logical filling process remains identical!)*
 
 ---
 
